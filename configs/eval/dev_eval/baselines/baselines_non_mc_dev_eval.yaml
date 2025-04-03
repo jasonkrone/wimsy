@@ -1,0 +1,22 @@
+wandb:
+  project_name: dev_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baseline_dev_eval_08_29_24
+  tasks:
+    <<: *non_multi_choice_dev_eval_tasks 

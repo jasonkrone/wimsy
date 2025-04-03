@@ -1,0 +1,21 @@
+name: prep-books
+
+resources:
+  cloud: aws
+  instance_type: i3.8xlarge
+  disk_size: 600
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+file_mounts:
+  /output:
+    source: s3://jpt-output
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+  echo "setup"
+
+run: |
+  echo "run"

@@ -1,0 +1,77 @@
+vars:
+
+  elastic_search_base_args: &es_args
+    index_name: &index_name temp 
+    hosts:
+      - http://elasticsearch:9200
+    request_timeout: 600
+    max_retries: 10
+    pbar_interval: 100_000
+    num_processes: 32
+
+  properties: &index_properties
+    created:
+      type: date
+      format: strict_date_optional_time||epoch_millis
+    id:
+      type: text
+      analyzer: standard
+    text:
+      type: text
+      analyzer: standard
+    path:
+      type: text
+      analyzer: standard
+    line_num:
+      type: integer
+
+
+pipeline:
+  #- id: eval_harness_document_writer
+  #  args:
+  #    destination_prefix: /local_out/decontam-artifacts
+  #    include_path: /sky_workdir/tasks 
+  #    input_datasets:
+  #      - arc_easy_decontam # [X] - added answers
+  #      - arc_challenge_decontam # [X] - added answers
+  #      - bbh_cot_fewshot # [X] - added options | didn't do answer b/c it's CoT so you'd need explanation.
+  #      - boolq_decontam # [X] - added answers
+  #      - commonsense_qa_decontam # [X] - added answers
+  #      - drop_decontam # [X] - added answers
+  #      - gpqa_main_cot_zeroshot_llama3_prompt # [X] - added answers
+  #      - gsm8k_decontam # [X] - added answers
+  #      - gsm8k_mc_decontam # [X] - added answers
+  #      - hellaswag_decontam # [X] - added answers
+  #      - lambada_standard # no change required answer is just last word which we already have
+  #      - minerva_math # no change required already includes the solution (which i think is answer + steps) 
+  #      - math_mc_decontam # [X] - added answers #######
+  #      - mmlu_decontam # [X] - added answers
+  #      - openbookqa_decontam # [X] - added answers
+  #      - piqa_decontam # [X] - added answers (diff from eval format for choices i think)
+  #      - race_decontam # [X] - added answers
+  #      - triviaqa_wiki_decontam # [X] - added answers (multiple answer aliases so we arbitrarily pick the first one)
+  #      - winogrande_decontam # [X] - added answers
+  #      - truthfulqa_mc2_decontam # [X] - added answers
+  #      - mini_realtoxicityprompts # nothing to change, probably not gonna decontam on this one
+  #      - mt_bench_decontam # nothing to add 
+  #      - alpaca_eval_decontam # [X] - added example model outputs (those are long FYI)
+  #      - ifeval # nothing to add
+  #      - humaneval_greedy # nothing to change
+  #      - pythonio_mc_decontam # [X] - added answers
+
+  - id: ngram_writer
+    args: 
+      <<: *es_args
+      metadata_dir: /local_out/decontam-artifacts
+      source_glob: /local_out/decontam-artifacts/*.jsonl.gz
+      default_ngram_size: 13
+      source_to_ngram_size:
+        bbh_cot_fewshot_boolean_expressions: 9
+        bbh_cot_fewshot_multistep_arithmetic_two: 8
+        bbh_cot_fewshot_sports_understanding: 9
+        bbh_cot_fewshot_word_sorting: 8
+        mini_realtoxicityprompts: 8
+        piqa_decontam: 12
+        triviaqa_wiki_decontam: 9
+      index_properties: *index_properties
+

@@ -1,0 +1,16 @@
+pipeline:
+  - id: sampler
+    args:
+      source_prefix: ./tests/artifacts/sampler/*_input*.jsonl
+      destination_prefix: ./tests/artifacts
+      metadata_prefix: ./tests/artifacts
+      suffix_depth: 2 # TODO: I think this doesn't matter
+      num_processes: 32 
+    call_kwargs:
+      jsonpath: metadata.extension
+      source_regex_to_value_to_samples:
+        ".*/.*_input\\.jsonl$":
+          c: 2
+          github-issues-filtered-structured: 1
+      is_dryrun: True
+ 

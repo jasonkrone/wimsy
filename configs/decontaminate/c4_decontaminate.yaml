@@ -1,0 +1,117 @@
+substitutions:
+  dataset: c4
+
+# things we need to do on launch 
+# start elastic search
+# download the test and dev ngrams file
+
+vars:
+  # TODO: should split out the repetative args
+  cleanup: &do_cleanup False # TODO: you'll want to change this to True for the larger datasets
+  num_processes: &num_processes 64
+
+  downloader:
+    urls_path: &urls_path ./preprocessing/dolma_urls/v1_6/$dataset.txt
+    download_destination: &download_destination /home/ubuntu/data/download-$dataset/documents
+
+  elastic_search_indexer:
+    source_glob: &indexer_source_glob /home/ubuntu/data/download-$dataset/documents/*/*.json.gz
+    index_name: &index_name $dataset
+    num_documents_to_index: &num_documents_to_index 52_000_000 
+    chunk_size: &chunk_size_to_index 500 
+
+  contaminated_span_tagger:
+    ngrams_path: &ngrams_path /home/ubuntu/test_and_dev_13_grams.jsonl.gz
+
+
+# TODO: we could do the import template thing from evaluation harness
+pipeline:
+
+  # download the data to decontaminate
+  - id: downloader
+    args:
+      urls_path: *urls_path
+      destination_prefix: *download_destination
+      files_per_shard: 20
+      num_processes: *num_processes
+      cleanup: *do_cleanup
+      is_distributed: True
+    call_kwargs: {}
+
+  # index the data to decontaminate
+  - id: elastic_search_indexer
+    args:
+      index_name: *index_name
+      hosts:
+        - http://elasticsearch:9200
+      request_timeout: 600
+      max_retries: 10
+      pbar_interval: 500_000
+      num_processes: *num_processes # this assumes the p3.16xl
+      num_documents_to_index: *num_documents_to_index
+      source_glob: *indexer_source_glob
+      chunk_size: *chunk_size_to_index # number of docs that are sent to es at a time 
+      properties:
+        added: 
+          type: text
+          analyzer: standard
+        created: 
+          type: date
+          format: strict_date_optional_time||epoch_millis
+        id: 
+          type: text
+          analyzer: standard
+        metadata: 
+          type: object
+          enabled: False
+        source: 
+          type: text
+          analyzer: standard
+        text: 
+          type: text
+          analyzer: standard
+        version: 
+          type: text
+          analyzer: standard
+        path:
+          type: text
+          analyzer: standard
+        line_num:
+          type: integer
+
+
+  #- id: elastic_search_snapshotter
+  #    index_name: *index_name
+  #    hosts: 
+  #      - http://elasticsearch:9200
+  #    request_timeout: 600
+  #    max_retries: 10
+  #    num_processes: *num_processes # this assumes the p3.16xl
+  #    repository_name: jpt-elastic 
+  #    repository_settings:
+  #      type: s3
+  #      settings:
+  #        bucket: jpt-elastic
+  #        region: us-east-1
+  #  
+  # generate and save all dev & test ngrams to decontaminate
+  #- id: ngram_generator
+
+  # tag the contaminated spans in each doc
+  # TODO: probably need to think of a data structure here 
+  - id: contaminated_span_tagger 
+    args:
+      index_name: *index_name
+      hosts: 
+        - http://elasticsearch:9200
+      request_timeout: 600
+      max_retries: 10
+      num_ngrams: 14_776_153 
+      pbar_interval: 10_000
+      num_processes: *num_processes # this assumes the p3.16xl
+      ngrams_path: *ngrams_path
+      max_hits_save_path: /home/ubuntu/data/download-$dataset/documents/queries_with_max_hits.jsonl
+      contaminated_spans_save_path: /home/ubuntu/data/download-$dataset/documents/contaminated_spans.jsonl
+      round_to_delimiter: "\n"
+      search_after_field: created
+

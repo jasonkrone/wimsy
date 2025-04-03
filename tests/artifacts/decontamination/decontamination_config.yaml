@@ -1,0 +1,83 @@
+substitutions:
+  dataset: test_decontamiantion 
+
+vars:
+    cleanup: &do_cleanup False
+    num_processes: &num_processes 64
+
+    elastic_search_indexer:
+      source_glob: &indexer_source_glob ./tests/artifacts/decontamination/input_docs.jsonl
+      index_name: &index_name $dataset
+      num_documents_to_index: &num_documents_to_index null 
+      chunk_size: &chunk_size_to_index 500
+
+    contaminated_span_tagger:
+      ngrams_path: &ngrams_path ./tests/artifacts/decontamination/ngrams.jsonl
+
+
+pipeline:
+  # index the data to decontaminate
+  - id: elastic_search_indexer
+    args:
+      index_name: *index_name
+      hosts:
+        - http://elasticsearch:9200
+      request_timeout: 600
+      max_retries: 10
+      pbar_interval: 100_000
+      num_processes: *num_processes # this assumes the p3.16xl
+      num_documents_to_index: *num_documents_to_index
+      source_glob: *indexer_source_glob
+      chunk_size: *chunk_size_to_index # number of docs that are sent to es at a time 
+      failures_save_path: ./tests/temp_output/decontamination/indexing_failures.jsonl
+      stats_save_path: ./tests/temp_output/decontamination/indexing_stats.jsonl
+      properties:
+        created:
+          type: date
+          format: strict_date_optional_time||epoch_millis
+        id: 
+          type: text
+          analyzer: standard
+        text:
+          type: text
+          analyzer: standard
+        path:
+          type: text
+          analyzer: standard
+        line_num:
+          type: integer
+      property_to_jsonpath:
+        id: id
+        text: text
+        created: created
+
+  # TODO: the ngrams file we're using here is temp
+  - id: contaminated_span_tagger 
+    args:
+      index_name: *index_name
+      hosts: 
+        - http://elasticsearch:9200
+      request_timeout: 600
+      max_retries: 10
+      num_ngrams: 14_776_153 
+      pbar_interval: 10_000
+      num_processes: *num_processes # this assumes the p3.16xl
+      ngrams_path: *ngrams_path
+      max_hits_save_path: ./tests/temp_output/decontamination/queries_with_max_hits.jsonl
+      contaminated_spans_save_path: ./tests/temp_output/decontamination/contaminated_spans.jsonl
+      round_to_delimiter: null
+      search_after_field: created
+
+  - id: decontaminator 
+    args:
+      per_doc_stats_save_path: ./tests/temp_output/decontamination/decontamination_per_doc_stats.jsonl
+      aggregate_stats_save_path: ./tests/temp_output/decontamination/decontamination_avg_stats.jsonl
+      contaminated_spans_path: ./tests/temp_output/decontamination/contaminated_spans.jsonl
+      drop_doc_contamination_threshold: 1.0
+      replacement_text: "LOVE"
+      drop_entire_doc: False
+      is_dryrun: True # this means we don't move it i believe
+      num_processes: 8
+      property_to_jsonpath:
+        id: id
+        text: text

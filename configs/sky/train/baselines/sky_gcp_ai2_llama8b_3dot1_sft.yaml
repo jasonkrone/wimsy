@@ -1,0 +1,36 @@
+name: tulu-v3-sft-ai2-code 
+
+resources:
+  accelerators: [H100:8, A100-80GB:8, A100-80GB:4, A100:8, A100-80GB:4, A100:4, A100-80GB:2, A100:2]
+  cloud: gcp
+  region: us-central1
+  image_id: projects/deeplearning-platform-release/global/images/pytorch-2-4-cu124-v20241118-debian-11-py310
+
+num_nodes: 1
+
+file_mounts:
+  /output:
+    source: s3://wimsy
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+
+  env_name=tulu
+  conda create -n $env_name python=3.10 -y
+  conda activate $env_name
+  cd ~/sky_workdir/open-instruct
+  source ~/sky_workdir/bash/setup.sh ; install_tulu3_requirements
+  conda deactivate
+ 
+
+run: |
+
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  env_name=olmo
+
+  conda activate $env_name
+
+  source ~/sky_workdir/bash/run_training.sh; run_ai2_tulu_v3_sft
+

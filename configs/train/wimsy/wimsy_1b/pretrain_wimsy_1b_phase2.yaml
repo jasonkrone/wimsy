@@ -1,0 +1,71 @@
+##########################################
+#                 Imports                #
+##########################################
+
+include: configs/train/wimsy/wimsy_1b/architectures/_llama_1b_architecture_yaml
+include: configs/train/wimsy/wimsy_1b/shared_hyper_params/_full_run_shared_hyper_params_yaml
+include: configs/train/wimsy/wimsy_1b/phase_hyper_params/_wimsy_1b_phase2_hyper_params_yaml
+include: configs/train/wimsy/data/_pretrain_phase2b_data_mixes_yaml
+include: configs/train/wimsy/_wimsy_template_yaml
+
+##########################################
+#             Weights & Biases           #
+##########################################
+
+wandb:
+  project_name: wimsy-phase2
+  run_name: pretrain-phase2-load-optim-cos-lr-model-wimsy1b-phase1b-data-phase2b-base
+
+############################################
+#              Checkpointing               #
+############################################
+
+ckpt:
+  copy_ckpt_to_local: False
+  resume_ckpt: /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/87193
+  checkpointer: fsdp_checkpointer
+  resume_from_iter: null # we set it to null so it starts counting to max steps from 0 
+  load_optimizer: True
+  load_dataset_loader: False
+  strip_prefix: _orig_mod.
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output
+  copy_dir: /copy
+  ckpt_interval: *ckpt_interval
+
+
+###########################################
+#                  Data                   #
+###########################################
+
+data:
+  data_loader:
+    id: streaming_data_loader
+    args:
+      pin_memory: True
+      batch_size: *batch_size
+      num_workers: *num_workers
+
+  train_dataset:
+    id: streaming_text_dataset
+    args:
+      load_mask: False
+      streams:
+        *pretrain_phase_2b_base_train_mix
+      batch_size: *batch_size
+      batching_method: random
+      shuffle: True
+      shuffle_seed: *seed
+      keep_zip: False
+
+  dev_dataset:
+    id: streaming_text_dataset
+    args:
+      load_mask: False
+      streams:
+        *pretrain_phase_2b_base_dev_mix
+      batch_size: *batch_size
+      batching_method: random
+      shuffle: True
+      shuffle_seed: *seed
+      keep_zip: False

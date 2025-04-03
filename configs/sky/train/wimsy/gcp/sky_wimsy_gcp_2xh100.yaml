@@ -1,0 +1,89 @@
+name: wimsy-dryrun-gpc-h100 
+
+resources:
+  accelerators: [H100:8]
+  cloud: gcp
+  region: us-central1
+  disk_size: 1000
+
+num_nodes: 2
+
+file_mounts:
+  /output:
+    source: s3://jpt-output
+    mode: MOUNT
+  /books:
+    source: s3://books-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    mode: COPY 
+  /wiki:
+    source: s3://wiki-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    mode: COPY 
+  /amps:
+    source: s3://amps-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    mode: COPY
+  /mathcoder:
+    source: s3://mathcoder2-synthmath-mds-decontaminated-ctx-4096-tokenizer-tikt
+    mode: COPY
+
+
+workdir: ~/Developer/jpt
+
+setup: |
+  remote_sqsh_path="s3://jpt-apps/pt2dot6_11_30_24.sqsh"
+  
+  local_sqsh_path="/tmp/train.sqsh"
+  env_name=train_env
+
+  # updates fix some enroot issues on GCP
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt update && sudo apt upgrade -y
+  
+  # install enroot
+  source ./bash/setup.sh; install_enroot
+  
+  # copy the sqsh file
+  echo "copying sqsh file"
+  aws s3 cp $remote_sqsh_path $local_sqsh_path
+  
+  # create the enroot env 
+  echo "creating enroot env"
+  enroot create --name $env_name $local_sqsh_path
+
+  # remove the bad driver
+  sudo apt-get remove --purge nvidia-*
+  # install the correct driver
+  sudo apt-get install nvidia-driver-460
+
+ 
+
+run: |
+  # kill $(lsof -ti :1234 | head -n 1)
+  #source ./bash/setup.sh ; clean_tmp
+
+  # expected to exec with --env CONFIG=./configs/train/llm_exps/exp_0_baseline_tweaks/baseline.yaml
+  #root_dir=/sky_workdir
+  #config_path=${root_dir}/${CONFIG}
+  #echo "config path: ${config_path}"
+
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  
+  env_name=train_env
+
+  config=./configs/train/wimsy/wimsy_1b/pretrain_wimsy_1b_mini_run.yaml
+
+  enroot start \
+    --rw \
+    --mount ~/sky_workdir:/sky_workdir \
+    --mount /books:/books \
+    --mount /wiki:/wiki \
+    --mount /amps:/amps \
+    --mount /mathcoder:/mathcoder \
+    --mount /tmp:/tmp \
+    --mount /output:/output \
+    --env SKYPILOT_NUM_NODES=$num_nodes \
+    --env SKYPILOT_NODE_IPS \
+    --env SKYPILOT_NUM_GPUS_PER_NODE \
+    --env SKYPILOT_NODE_RANK \
+    --env TRANSFORMERS_CACHE=/tmp/.cache \
+    $env_name \
+    /sky_workdir/bash/run_training.sh train $config

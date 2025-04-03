@@ -1,0 +1,3 @@
+The code in this directory for evaluating mt_bench is largely coppied from the
+original mt_bench code and maintains the associated Apache 2.0 license.
+Code modified to support use of yaml config vs. argparse arguments.

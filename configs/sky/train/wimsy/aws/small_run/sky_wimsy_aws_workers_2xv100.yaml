@@ -1,0 +1,84 @@
+name: temp-phased-train-workers
+
+resources:
+  instance_type: p3.2xlarge
+  cloud: aws
+  region: us-east-1
+  # ami-0772e0bfc7cc9c5de # OSS nvidia driver pytorch 2.5 (Ubuntu 22.04)
+  # ^ this one doesn't support p3 tho
+
+num_nodes: 2
+
+file_mounts:
+  /output:
+    source: s3://jpt-output
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+  remote_sqsh_path="s3://jpt-apps/pt2dot6_11_30_24.sqsh"
+
+  # special stuff we have to do b/c the AMI is old
+  #######################################
+  sudo snap install aws-cli --classic
+  source ./bash/setup_fsx.sh ; install_fsx_client 
+  #######################################
+
+  local_sqsh_path="/tmp/train.sqsh"
+  env_name=train_env
+
+  # mount fsx
+  source ./bash/setup_fsx.sh ; mount_fsx
+  
+  # install enroot
+  source ./bash/setup.sh; install_enroot
+  
+  # copy the sqsh file
+  echo "copying sqsh file"
+  aws s3 cp $remote_sqsh_path $local_sqsh_path
+  
+  # create the enroot env 
+  echo "creating enroot env"
+  enroot create --name $env_name $local_sqsh_path
+ 
+
+run: |
+
+  env_name=train_env
+  root_dir=/sky_workdir
+  fsx_mountpoint=/mnt/fsx
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+
+  config1=./configs/train/wimsy_7b/pretrain_wimsy_7b_phase1a.yaml
+  #config2=./configs/train/wimsy_7b/pretrain_wimsy_7b_phase2.yaml
+  
+  #source ./bash/setup.sh ; clean_tmp
+  
+  #enroot start \
+  #  --rw \
+  #  --mount ~/sky_workdir:/sky_workdir \
+  #  --mount $fsx_mountpoint:/data \
+  #  --mount /tmp:/tmp \
+  #  --mount /output:/output \
+  #  --env SKYPILOT_NUM_NODES=$num_nodes \
+  #  --env SKYPILOT_NODE_IPS \
+  #  --env SKYPILOT_NUM_GPUS_PER_NODE \
+  #  --env SKYPILOT_NODE_RANK \
+  #  --env TRANSFORMERS_CACHE=/tmp/.cache \
+  #  $env_name \
+  #  /sky_workdir/bash/run_training.sh run_train_in_phases $config1 $config2
+
+  enroot start \
+    --rw \
+    --mount ~/sky_workdir:/sky_workdir \
+    --mount $fsx_mountpoint:/data \
+    --mount /tmp:/tmp \
+    --mount /output:/output \
+    --env SKYPILOT_NUM_NODES=$num_nodes \
+    --env SKYPILOT_NODE_IPS \
+    --env SKYPILOT_NUM_GPUS_PER_NODE \
+    --env SKYPILOT_NODE_RANK \
+    --env TRANSFORMERS_CACHE=/tmp/.cache \
+    $env_name \
+    /sky_workdir/bash/run_training.sh run_train $config1

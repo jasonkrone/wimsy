@@ -1,0 +1,57 @@
+substitutions:
+  dataset: dclm-top500b
+  source_extension: jsonl.zstd
+
+vars:
+  cleanup: &do_cleanup True
+  is_distributed: &is_distributed True
+ 
+  downloader:
+    # rank => shard name => path
+    urls_path: &urls_path
+      "0": 
+        gre-0.32-leq-0.36: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.32-leq-0.36.txt
+      "1": 
+        gre-0.36-leq-0.40: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.36-leq-0.40.txt
+      "2": 
+        gre-0.40-leq-0.46: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.40-leq-0.46.txt
+      "3": 
+        gre-0.46-leq-0.52: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.46-leq-0.52.txt
+      "4": 
+        gre-0.52-leq-0.59: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.52-leq-0.59.txt
+      "5": 
+        gre-0.59-leq-0.68: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.59-leq-0.68.txt
+      "6": 
+        gre-0.68-leq-0.78: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.68-leq-0.78.txt
+      "7": 
+        gre-0.78-leq-0.88: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.78-leq-0.88.txt
+      "8": 
+        gre-0.88-leq-0.97: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.88-leq-0.97.txt
+      "9": 
+        gre-0.97-leq-1.00: ./preprocessing/dataset_urls/dclm_baseline_top500b/gre-0.97-leq-1.00.txt
+    num_shards: &num_shards 10
+    source_location: &source_location s3
+
+  elastic_search_indexer:
+    num_documents_to_index: &num_documents_to_index null 
+
+  decontaminator:
+    drop_entire_doc: &drop_entire_doc True
+    drop_doc_contamination_threshold: &drop_doc_contamination_threshold 1.0
+  
+  map_jsonl:
+    keys_to_remove: &keys_to_remove
+      - metadata
+      - language_id_whole_page_fasttext
+
+  split_maker:
+    # TODO: you gotta change this for each dataset
+    # list here: https://docs.google.com/spreadsheets/d/1Gc2RKYD6QuzXwG0Vj54VQxRYxXcydTu9QxV8zEHrJAE/edit#gid=0
+    avg_num_tokens_per_doc: &avg_num_tokens_per_doc 930
+    dev_size: &dev_size 5000
+
+  split_writer:
+    shard_from_source_regex: &shard_from_source_regex (gre-\d+\.\d+-leq-\d+\.\d+)
+
+
+include: _prep_dclm_template_yaml 

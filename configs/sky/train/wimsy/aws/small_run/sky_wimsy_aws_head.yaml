@@ -1,0 +1,16 @@
+name: head-node
+
+resources:
+  instance_type: m5.8xlarge
+  cloud: aws
+  region: us-east-1
+
+num_nodes: 1
+
+workdir: ~/Developer/jpt
+
+setup:
+  echo "setup"
+
+run: |
+  echo "running"

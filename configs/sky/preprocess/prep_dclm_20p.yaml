@@ -1,0 +1,42 @@
+name: prep-dclm-20p
+
+num_nodes: 16
+
+resources:
+  cloud: aws
+  instance_type: i3.16xlarge
+  disk_size: 1300
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+workdir: ~/Developer/jpt
+
+setup: |
+  # download the artifact
+  source ~/sky_workdir/keys.env; aws s3 cp s3://jpt-artifacts/test_and_dev_13_grams.jsonl.gz ~/sky_workdir/test_and_dev_13_grams.jsonl.gz
+
+  # setup elastic search and output dirs
+  dir_list=(/es /local_out)
+  for dir in "${dir_list[@]}"; do
+    sudo mkdir -p $dir
+    sudo chown -R 1000:0 $dir
+    sudo chmod -R 777 $dir
+  done
+
+
+run: |
+  
+  # sudo sysctl -w vm.max_map_count=262144
+
+  cd /sky_workdir
+  source keys.env; docker login -u jpolingkrone -p $DOCKER_PASSWORD
+
+  ## get elastic search running
+  compose_path=./docker/data_prep/docker_compose.yaml
+  docker compose -f $compose_path up -d
+  sleep 15
+
+  ## run data prep
+  config_path=./configs/preprocess/preprocess_dclm_20p.yaml
+  docker compose -f $compose_path exec jpt_prep_data bash -c "cd /sky_workdir && python -m preprocessing.prep_data --config $config_path"
+  docker compose -f $compose_path down

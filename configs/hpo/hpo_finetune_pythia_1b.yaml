@@ -1,0 +1,65 @@
+##########################################
+#            Run specific params          #
+##########################################
+
+hpo:
+  num_hpo_trials: 16
+  config_updater:
+    id: lr_schedule_updater
+
+hyper_params:
+
+  trainer_id: &trainer_id hf_trainer
+
+  tokenizer: &tokenizer
+    id: hf_auto_tokenizer
+    args:
+      pretrained_model_name_or_path: EleutherAI/pythia-1.4b-deduped
+
+  proccess_group:
+    init_process_group_at_start: &init_process_group_at_start False
+    shutdown_distributed_processes_at_end: &shutdown_distributed_processes_at_end False
+
+
+##########################################
+#                 Imports                #
+##########################################
+
+include: configs/hpo/_shared_hpo_finetune_hyper_params_yaml
+include: configs/finetune/_finetune_template_yaml
+
+##########################################
+#             Weights & Biases           #
+##########################################
+
+wandb:
+  project_name: pythia_1b_toks_69b_finetune_lr_hpo
+  run_name: lr_search_finetune_pythia_1b_toks_69b
+
+############################################
+#                 Models                   #
+############################################
+
+model:
+  id: hf 
+  args: "pretrained=EleutherAI/pythia-1.4b-deduped,revision=step33000"
+  precision: bf16
+  do_compile: False
+  parallelism: fsdp_model
+  precision: bf16
+  max_len: 2048 # actual context len used is set by data loader to max len in dataset so MFU will be wrong
+
+############################################
+#              Checkpointing               #
+############################################
+
+ckpt:
+  checkpointer: fsdp_checkpointer
+  strip_prefix: _orig_mod.
+  save_best_model_at_end_for_eval: False
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output
+  hf_username: jasonkrone
+  copy_dir: /copy
+  ckpt_interval: *ckpt_interval
+

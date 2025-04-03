@@ -1,0 +1,18 @@
+shared_hyper_params:
+
+  general:
+    gpu_type: &gpu_type A100_bf16
+
+  iters:
+    batch_size: &batch_size 4 # 8: OOM, 4: runs, 6: runs, 7: largest
+
+  intervals:
+    ckpt_interval: &ckpt_interval 1000
+    log_interval: &log_interval 5
+    eval_interval: &eval_interval 1000
+
+  dev_eval:
+    max_eval_iters: &max_eval_iters 2
+
+  data_loader:
+    num_workers: &num_workers 16

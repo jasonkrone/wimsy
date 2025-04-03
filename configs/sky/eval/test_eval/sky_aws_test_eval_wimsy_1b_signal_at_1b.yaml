@@ -1,0 +1,91 @@
+name: wimsy-test-eval-aws-h100 
+
+resources:
+  instance_type: p5.48xlarge
+  cloud: aws
+  region: us-east-1
+  zone: us-east-1f
+  image_id: ami-0772e0bfc7cc9c5de # OSS nvidia driver pytorch 2.5 (Ubuntu 22.04)
+
+num_nodes: 2
+
+file_mounts:
+  /output:
+    source: s3://wimsy
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+
+  remote_sqsh_path="s3://jpt-apps/pt2dot6_11_30_24.sqsh"
+  
+  local_sqsh_path="/tmp/train.sqsh"
+  env_name=train_env
+
+  # updates fix some enroot issues on GCP
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt update -y && sudo apt upgrade -y
+  
+  # install enroot
+  source ./bash/setup.sh; install_enroot
+
+  # install the AWS cli tool 
+  sudo apt install -y unzip
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  sudo ./aws/install
+  
+  # copy the sqsh file
+  echo "copying sqsh file"
+  aws s3 cp $remote_sqsh_path $local_sqsh_path
+  
+  # create the enroot env 
+  echo "creating enroot env"
+  enroot create --name $env_name $local_sqsh_path
+ 
+
+run: |
+
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  
+  env_name=train_env
+
+  config=./configs/eval/test_eval/wimsy/wimsy_1b_phase2b_base_signal_at_1b_test_eval.yaml
+
+  # TODO: b/c IDK how to do multi-node right now
+
+  if [ "$SKYPILOT_NODE_RANK" -eq 0 ]; then
+    enroot start \
+      --rw \
+      --mount ~/sky_workdir:/sky_workdir \
+      --mount /tmp:/tmp \
+      --mount /output:/output \
+      --env SKYPILOT_NUM_NODES=$num_nodes \
+      --env SKYPILOT_NODE_IPS \
+      --env SKYPILOT_NUM_GPUS_PER_NODE \
+      --env SKYPILOT_NODE_RANK \
+      --env TRANSFORMERS_CACHE=/tmp/.cache \
+      $env_name \
+      /sky_workdir/bash/run_eval.sh evaluate $config
+  fi
+
+
+  #if [ "$SKYPILOT_NODE_RANK" -eq 0 ]; then
+
+  #  enroot start \
+  #    --rw \
+  #    --mount ~/sky_workdir:/sky_workdir \
+  #    --mount /tmp:/tmp \
+  #    --mount /output:/output \
+  #    --env SKYPILOT_NUM_NODES=$num_nodes \
+  #    --env SKYPILOT_NODE_IPS \
+  #    --env SKYPILOT_NUM_GPUS_PER_NODE \
+  #    --env SKYPILOT_NODE_RANK \
+  #    --env TRANSFORMERS_CACHE=/tmp/.cache \
+  #    $env_name \
+  #    /sky_workdir/bash/run_debug.sh run_convert_ckpt $config
+
+  #fi
+
+

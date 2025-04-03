@@ -1,0 +1,137 @@
+wandb:
+  project_name: baseline_eval
+  run_name: null
+
+compute:
+  device: null
+  is_distributed: True
+  world_size: 8
+
+baselines:
+
+    #######################################
+    #           best & worst pre-train    #
+    #######################################
+
+    # 2048
+    #olmo_1b_toks_21b:
+    #  id: hf
+    #  args: pretrained=jasonkrone/olmo_1b_toks_21b,tokenizer=allenai/OLMo-1B-hf
+
+    # 2048
+    #olmo_1b:
+    #  id: hf
+    #  args: pretrained=allenai/OLMo-1B-hf
+
+    #olmo_7b_toks_168b:
+    #  id: hf
+    #  args: pretrained=jasonkrone/olmo_7b_toks_168b,tokenizer=allenai/OLMo-7B-hf
+
+    ### 4096
+    #llama2:
+    #  id: hf
+    #  args: pretrained=meta-llama/Llama-2-7b-hf
+
+    #######################################
+    #           post-train 2048           #
+    #######################################
+
+    ######## OpenELM Instruct ##########
+    #open_elm_instruct_1_dot_1b:
+    #  id: hf
+    #  args: pretrained=jasonkrone/OpenELM-1_1B-instruct-fix-nan,trust_remote_code=True,add_bos_token=True,tokenizer=jasonkrone/OpenELM-Instruct-Tokenizer
+    #  completion_kwargs:
+    #    max_new_tokens: 1408
+    #    temperature: 0.7
+    #    do_sample: True
+
+    ############# Tiny Instruct ##########
+    #tiny-llama-chat-1-dot-1b-503b-toks:
+    #  id: hf
+    #  args: pretrained=TinyLlama/TinyLlama-1.1B-Chat-v0.1,tokenizer=jasonkrone/TinyLlama-1.1B-Chat-v0.1-Tokenizer
+    #  completion_kwargs:
+    #    max_new_tokens: 1408
+    #    temperature: 0.7
+    #    do_sample: True
+
+    ############## pythia 6.9B Instruct ##########
+    #pythia-6-dot-9b-tulu-v1-sft:
+    #  id: hf
+    #  args: pretrained=allenai/open-instruct-pythia-6.9b-tulu,tokenizer=jasonkrone/open-instruct-pythia-6.9b-tulu-tokenizer
+    #  completion_kwargs:
+    #    max_new_tokens: 1408
+    #    temperature: 0.7
+    #    do_sample: True
+
+    ############# Llama-1 Instruct ##########
+    #llama-1-7b-tulu-v1-sft:
+    #  id: hf
+    #  args: pretrained=/artifacts/tulu-7b-recovered,tokenizer=jasonkrone/tulu-7b-tokenizer
+    #  completion_kwargs:
+    #    max_new_tokens: 1408
+    #    temperature: 0.7
+    #    do_sample: True
+
+    ############# OLMo 7b Instruct ##########
+    #olmo-7b-tulu-v2-sft:
+    #  id: hf
+    #  args: pretrained=allenai/OLMo-7B-SFT,trust_remote_code=True
+    #  completion_kwargs:
+    #    max_new_tokens: 1408
+    #    temperature: 0.7
+    #    do_sample: True
+
+    #olmo-7b-tulu-v2-instruct:
+    #  id: hf
+    #  args: pretrained=allenai/OLMo-7B-Instruct,trust_remote_code=True
+    #  completion_kwargs:
+    #    max_new_tokens: 1408
+    #    temperature: 0.7
+    #    do_sample: True
+
+    #########################################
+    ###           post-train 4096           #
+    #########################################
+
+    #llama-2-7b-tulu-v2-sft:
+    #  id: hf
+    #  args: pretrained=allenai/tulu-2-7b
+    #  completion_kwargs:
+    #    max_new_tokens: 2048
+    #    temperature: 0.7
+    #    do_sample: True
+
+    #llama-2-7b-tulu-v2-instruct:
+    #  id: hf
+    #  args: pretrained=allenai/tulu-2-dpo-7b
+    #  completion_kwargs:
+    #    max_new_tokens: 2048
+    #    temperature: 0.7
+    #    do_sample: True
+
+    # TODO: right now float16 gives NaN issue. Someone said you could fix by setting pad to bos. 
+    # TODO: top p might also solve the problem
+    llama-2-7b-chat:
+      id: hf
+      args: pretrained=meta-llama/Llama-2-7b-chat-hf,dtype=float16
+      completion_kwargs:
+        max_new_tokens: 2048
+        temperature: 0.7
+        do_sample: True
+        #top_p: 1.0
+        #system_prompt: "You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."
+
+model:
+  id: null
+  args: null
+  name: null
+
+test_eval:
+  output_path: /output/09_23_24_baselines_alpaca_eval
+  limit: null
+  batch_size: 3
+  eval_dataset_kwargs: 
+    path: "jasonkrone/alpaca_eval_pythia6dot9_tulu_v1_baseline"
+  #eval_dataset_kwargs:
+  #  path: "tatsu-lab/alpaca_eval"
+  #  name: "alpaca_eval_gpt4_baseline"

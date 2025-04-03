@@ -1,0 +1,16 @@
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0071.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0064.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0073.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0015.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0011.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0016.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0018.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0040.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0027.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0059.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0007.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0001.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0033.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0026.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0057.json.gz
+https://olmo-data.org/dolma-v1_7/reddit/reddit-0060.json.gz

@@ -1,0 +1,114 @@
+
+# allenai/OLMo-2-1124-7B
+# stage1-step72000-tokens302B
+
+test_eval_tasks: &test_eval_tasks
+    arc_easy:
+      shot: 0
+      batch_size: 64
+    arc_challenge:
+      shot: 0
+      batch_size: 64
+    # generative
+    bbh_cot_fewshot:
+      shot: 3
+      batch_size: auto
+    boolq:
+      shot: 0
+      batch_size: 16
+    # generative
+    commonsense_qa_cot_fewshot:
+      shot: 7
+      batch_size: auto
+    # generative
+    drop:
+      shot: 3
+      batch_size: 1
+    # generative
+    gsm8k_cot:
+      shot: 8
+      batch_size: 8
+    hellaswag:
+      shot: 10
+      batch_size: 16
+    # generative
+    humaneval_greedy:
+      shot: 0
+      batch_size: 8
+    # generative
+    # for llama
+    humaneval_greedy_add_space:
+      shot: 0
+      batch_size: 8
+    # generative
+    ifeval:
+      shot: 0
+      batch_size: auto
+      apply_chat_template: *do_apply_chat_template
+      gen_kwargs:
+        until: [ ]
+        do_sample: false
+        temperature: 0.0
+        max_gen_toks: *ifeval_max_gen_toks
+    lambada_openai:
+      shot: 0
+      batch_size: 8
+    # generative
+    minerva_math:
+      shot: 4
+      batch_size: 8
+    mmlu:
+      shot: 5
+      batch_size: 8
+    openbookqa:
+      shot: 0
+      batch_size: auto
+    piqa:
+      shot: 0
+      batch_size: 64
+    race_h_all_questions:
+      shot: 0
+      batch_size: auto
+    # generative
+    triviaqa_wiki:
+      shot: 5
+      batch_size: 4
+    winogrande:
+      shot: 5
+      batch_size: 4
+    # TODO: need to look more into what mc2 is
+    truthfulqa_mc2:
+      shot: 0
+      batch_size: 64
+    # generative
+    mini_realtoxicityprompts:
+      shot: 0
+      batch_size: auto
+
+
+# scores on these aren't high enough to matter
+#deprecated_test_eval_tasks: &deprecated_test_eval_tasks
+#    # generative
+#    gpqa_main_cot_zeroshot:
+#      shot: 0
+#      batch_size: 8
+#      apply_chat_template: *do_apply_chat_template
+#      gen_kwargs:
+#        until:
+#          - "</s>"
+#        do_sample: false
+#        temperature: 0.0
+#        max_gen_toks: *gpqa_max_gen_toks
+#    # generative
+#    gpqa_main_cot_zeroshot_llama3_prompt:
+#      shot: 0
+#      batch_size: 8
+#      apply_chat_template: *do_apply_chat_template
+#      gen_kwargs:
+#        until:
+#          - "</s>"
+#        do_sample: false
+#        temperature: 0.0
+#        max_gen_toks: *gpqa_max_gen_toks
+
+

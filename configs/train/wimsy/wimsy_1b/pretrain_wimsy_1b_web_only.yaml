@@ -1,0 +1,69 @@
+##########################################
+#                 Imports                #
+##########################################
+
+include: configs/train/wimsy/wimsy_1b/architectures/_llama_1b_architecture_theta_500k_yaml
+include: configs/train/wimsy/wimsy_1b/shared_hyper_params/_full_run_shared_hyper_params_yaml
+include: configs/train/wimsy/wimsy_1b/phase_hyper_params/_wimsy_1b_phase1_hyper_params_v3_yaml
+include: configs/train/wimsy/data/_pretrain_phase1_data_mixes_yaml
+include: configs/train/wimsy/_wimsy_template_yaml
+
+##########################################
+#             Weights & Biases           #
+##########################################
+
+wandb:
+  project_name: wimsy-phase1
+  run_name: pretrain-01-21-25-phase1-model-llama1b-data-web-only
+
+############################################
+#              Checkpointing               #
+############################################
+
+ckpt:
+  resume_ckpt: True
+  save_best_model_at_end_for_eval: False
+  checkpointer: fsdp_checkpointer
+  strip_prefix: _orig_mod.
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output
+  copy_dir: /copy
+  ckpt_interval: *ckpt_interval
+
+###########################################
+#                  Data                   #
+###########################################
+
+data:
+  data_loader:
+    id: streaming_data_loader
+    args:
+      pin_memory: True
+      batch_size: *batch_size
+      num_workers: *num_workers
+
+  train_dataset:
+    id: streaming_text_dataset
+    args:
+      load_mask: False
+      streams:
+        *pretrain_web_train_mix
+      batch_size: *batch_size
+      batching_method: random
+      shuffle: True
+      shuffle_seed: *seed
+      keep_zip: False
+
+  dev_dataset:
+    id: streaming_text_dataset
+    args:
+      load_mask: False
+      streams:
+        *pretrain_web_dev_mix
+      batch_size: *batch_size
+      batching_method: random
+      shuffle: True
+      shuffle_seed: *seed
+      keep_zip: False
+
+

@@ -1,0 +1,140 @@
+wandb:
+  project_name: baseline_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+baselines:
+  #pythia-1-dot-4b-deduped-step23000-aka-48b-toks:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step23000
+  # hellaswag
+  replicate_llama2:
+    id: hf
+    args: pretrained=meta-llama/Llama-2-7b-hf
+  # commonsenseqa
+  # openbookqa
+  # race
+  # squad
+  # winogrande
+  replicate_llama3:
+    id: hf
+    args: pretrained=meta-llama/Meta-Llama-3-8B
+  # gpqa
+  # ifeval
+  replicate_llama3_instruct:
+    id: hf
+    args: pretrained=meta-llama/Meta-Llama-3-8B-Instruct
+  # realtoxicity
+  replicate_gemma2_9b:
+    id: hf
+    args: pretrained=google/gemma-2-9b
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baselines_07_30_24
+  tasks:
+    # 0-shot
+    #arc_easy:
+    #  shot: 0
+    #  batch_size: 64
+    #arc_challenge:
+    #  shot: 0
+    #  batch_size: 64
+    #boolq:
+    #  shot: 0
+    #  batch_size: 16
+    ## TODO: not 100% on this task name b/c there's a number of options
+    gpqa_main_zeroshot:
+      shot: 0
+      batch_size: 8
+    ## generative
+    #humaneval_greedy:
+    #  shot: 0
+    #  batch_size: 8
+    # generative
+    #humaneval_greedy_add_space:
+    #  shot: 0
+    #  batch_size: 8
+    ## generative
+    #ifeval:
+    #  shot: 0
+    #  batch_size: auto
+    #piqa:
+    #  shot: 0
+    #  batch_size: 64
+    #lambada_openai:
+    #  shot: 0
+    #  batch_size: 8
+    #openbookqa:
+    #  shot: 0
+    #  batch_size: auto
+    race:
+      shot: 0
+      batch_size: auto
+    ### generative
+    realtoxicityprompts:
+      shot: 0
+      batch_size: auto
+    ## generative
+    squadv2:
+      shot: 1
+      batch_size: 8
+    ## TODO: need to look more into what mc2 is
+    #truthfulqa_mc2:
+    #  shot: 0
+    #  batch_size: 64
+    ## 3-shot
+    ## TODO: figure out why this is so slow
+    ## generative
+    bbh_cot_fewshot:
+      shot: 3
+      batch_size: auto
+    ## generative
+    #drop:
+    #  shot: 3
+    #  batch_size: 1
+    ## 4-shot
+    ## TODO: doulbe check this is right, also a benchmark so idk if you can treat it like normal task
+    ## generative
+    #minerva_math:
+    #  shot: 4
+    #  batch_size: 8
+    ## 5-shot
+    #mmlu:
+    #  shot: 5
+    #  batch_size: 8
+    # # generative
+    #triviaqa_wiki:
+    #  shot: 5
+    #  batch_size: 4
+    #winogrande:
+    #  shot: 5
+    #  batch_size: 4
+    ## 7-shot
+    # generative
+    commonsense_qa_cot_fewshot:
+      shot: 7
+      batch_size: auto
+    ## 8-shot
+    ## generative
+    #gsm8k_cot:
+    #  shot: 8
+    #  batch_size: 8
+    ## 10-shot
+    hellaswag:
+      shot: 0
+      batch_size: 16
+    # TODO: need to fix / check shot is right etc; might not be worth it
+    #- agieval_nous

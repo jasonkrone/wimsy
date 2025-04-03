@@ -1,0 +1,23 @@
+substitutions:
+  source_extension: jsonl.zstd
+
+
+pipeline:
+  - id: mixer
+    args:
+      prefix_depth: 2
+      num_processes: 16
+      metadata_prefix: /local_out/temp-gre-leq-bucket-metadata
+    call_kwargs:
+      cleanup: False # we need to keep the modified source files
+      mixtures:
+        - destination_prefix: /local_out/temp-gre-leq-bucket/gre-0.32-leq-0.36
+          inputs:
+            # TODO: make this just have 1 file
+            - source_prefix: /local_out/temp-merge/gre-0.32-les-0.36/*.$source_extension
+              sample_size: null
+              remove_sample: True
+            # TODO: make this just have 1 file
+            - source_prefix: /local_out/temp-merge/eq-0.36/*.$source_extension
+              sample_size: 0.5
+              remove_sample: True

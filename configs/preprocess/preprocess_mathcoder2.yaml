@@ -1,0 +1,31 @@
+substitutions:
+  dataset: mathcoder2-synthmath
+  source_extension: jsonl
+
+vars:
+  cleanup: &do_cleanup True
+  is_distributed: &is_distributed False
+
+  downloader:
+    urls_path: &urls_path ./preprocessing/dataset_urls/dolmino_mix_1124/mathcoder2_synthmath.txt
+    num_shards: &num_shards 1
+    source_location: &source_location url
+
+  elastic_search_indexer:
+    num_documents_to_index: &num_documents_to_index null
+
+  decontaminator:
+    drop_entire_doc: &drop_entire_doc True
+    drop_doc_contamination_threshold: &drop_doc_contamination_threshold 1.0
+  
+  map_jsonl:
+    keys_to_remove: &keys_to_remove
+      - created  # inconsistent datatype on created breaks dataloader
+      - added
+      - metadata
+
+  split_maker:
+    avg_num_tokens_per_doc: &avg_num_tokens_per_doc 1367
+    dev_size: &dev_size 5000
+
+include: _prep_dolma_template_yaml

@@ -1,0 +1,23 @@
+  
+
+pretrain_phase_1a_train_mix: &pretrain_phase_1a_train_mix
+  - local: /books/train
+    choose: 10000
+  #- local: /wiki/train
+  #  choose: 10000
+  #- local: /amps/train
+  #  choose: 10000
+  #- local: /mathcoder/train
+  #  choose: 10000
+  
+
+pretrain_phase_1a_dev_mix: &pretrain_phase_1a_dev_mix
+  - local: /books/train
+    proportion: 1
+  #- local: /wiki/train
+  #  proportion: 1
+  #- local: /amps/train
+  #  proportion: 1
+  #- local: /mathcoder/train
+  #  proportion: 1
+

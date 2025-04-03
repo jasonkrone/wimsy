@@ -1,0 +1,47 @@
+hyper_params:
+
+  general:
+    seed: &seed 234 # could different seed be messing things up somehow?
+
+  process_group:
+    init_process_group_at_start: &init_process_group_at_start True 
+    shutdown_distributed_processes_at_end: &shutdown_distributed_processes_at_end True
+
+  optimizer:
+    learning_rate: &learning_rate 0.00004 # TODO: this was copied directly from the ckpt
+    beta_1: &beta_1 0.9
+    beta_2: &beta_2 0.95
+    epsilon: &epsilon 0.00000001
+
+  lr_schedule: &lr_schedule
+    id: linear_annealing_lr_schedule 
+    args:
+      lr_max: *learning_rate # lr max will be set via the train in phases script using the lr from phase 1 ckpt
+      lr_min: 0.0
+      max_iters: 1.0
+      max_iter_units: percentage # max_iters will be set as a percentage of config.iters.max_iters
+
+  #lr_schedule: &lr_schedule
+  #  id: cosine_with_linear_warmup_lr_schedule
+  #  args:
+  #    warmup_iters: 5000 
+  #    lr_max: *learning_rate
+  #    cos_lr_min: 0.00003
+  #    warmup_lr_min: 0.0
+  #    max_iters: 1.0 # 125% of max iters so that max_iters / schedule iters = 80% 
+  #    max_iter_units: percentage # max_iters will be set as a percentage of config.iters.max_iters
+
+  loss:
+    max_grad_norm: &max_grad_norm 1.0
+    loss_fn: &loss_fn
+      id: cross_entropy_with_z_loss
+      args:
+        z_loss_coefficient: 0.00001
+
+  regularization:
+    weight_decay: &weight_decay 0.1
+    early_stopping_patience: &early_stopping_patience 3
+  
+  iters:
+    max_tokens: &max_tokens 10_000_000_000
+    max_iters: &max_iters null 

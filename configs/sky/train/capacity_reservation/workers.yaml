@@ -1,0 +1,75 @@
+name: worker-2-node-h100
+
+resources:
+  instance_type: p5.48xlarge
+  cloud: aws
+  region: us-east-1
+  zone: us-east-1f
+  image_id: ami-0aae066f85e9bc6a9
+
+num_nodes: 2
+
+file_mounts:
+  /output:
+    source: s3://jpt-output
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+  remote_sqsh_path="s3://jpt-apps/jpt.sqsh"
+  local_sqsh_path="/tmp/jpt.sqsh"
+  env_name=train_env
+
+  # install enroot
+  source ./bash/setup.sh; install_enroot
+
+  # copy the sqsh file
+  echo "copying sqsh file"
+  aws s3 cp $remote_sqsh_path $local_sqsh_path
+
+  # create the enroot env
+  echo "creating enroot env"
+  enroot create --name $env_name $local_sqsh_path
+  
+  data_dir=/home/ubuntu/data
+  mkdir -p $data_dir
+  source /home/ubuntu/sky_workdir/keys.env; aws s3 sync s3://books-memmap-decontaminated-ctx-4096-tokenizer-tiktoken $data_dir
+
+
+run: |
+  echo "running"
+
+  kill $(lsof -ti :1234 | head -n 1)
+
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+
+  config_path=/sky_workdir/configs/train/7b_fsdp/train_7b_fms_streaming.yaml
+
+  source ./bash/setup.sh ; clean_tmp
+
+  env_name=train_env
+  
+  #if [ "$SKYPILOT_NODE_RANK" -eq 0 ]; then
+  #  enroot start \
+  #    --rw \
+  #    --mount /home/ubuntu/sky_workdir:/sky_workdir \
+  #    $env_name \
+  #    /sky_workdir/run.sh run_nccl_tests
+  #fi
+
+  data_dir=/home/ubuntu/data
+
+  enroot start \
+    --rw \
+    --mount /home/ubuntu/sky_workdir:/sky_workdir \
+    --mount /output:/output \
+    --mount $data_dir:/data \
+    --mount /tmp:/tmp \
+    --env SKYPILOT_NUM_NODES=$num_nodes \
+    --env SKYPILOT_NODE_IPS \
+    --env SKYPILOT_NUM_GPUS_PER_NODE \
+    --env SKYPILOT_NODE_RANK \
+    --env TRANSFORMERS_CACHE=/tmp/.cache \
+    $env_name \
+    /sky_workdir/run.sh run_main $config_path

@@ -1,0 +1,146 @@
+seed: &seed 414
+
+##########################################
+#                 Imports                #
+##########################################
+
+model:
+  use_compile_profiler: False
+  do_offload_activations: False
+  use_meta_device: True
+  use_cache: False
+  do_compile: True
+  parallelism: fsdp_model
+  id: decoder_lm
+  initializer: null
+  precision: bf16
+  vocab_size: 100288
+  n_layers: 16
+  d_model: 2048
+  n_heads: 32
+  n_kv_heads: 1
+  d_hidden: 8192
+  use_bias: False
+  use_qk_norm: True
+  max_len: &context_len 4096
+  transformer_block: res_post_norm_transformer_block
+  attn: base_attn
+  mlp: mlp_swiglu
+  norm: rms_norm
+  pos_encoding: identity
+  qk_encoding: rotary_encoding
+  rope_base: 500_000 #10_000
+  p_dropout: 0.0
+  init_stdev: null
+
+# didn't include b/c we had to change the attn from flash to base_attn cuz fp32
+# configs/train/wimsy/wimsy_1b/architectures/_llama_1b_architecture_yaml
+include: configs/eval/test_eval/_test_evals_with_signal_at_1b_yaml
+
+wandb:
+  project_name: wimsy_test_eval
+  run_name: wimsy_1b #wimsy_1b_phase1b_40b_train_toks 
+
+compute:
+  device: cuda
+  is_distributed: True
+  backend: nccl
+
+############################################
+#              Checkpointing               #
+############################################
+
+ckpt:
+  strict: False
+  load_dataset_loader: False
+  load_optimizer: False
+  checkpointer: fsdp_checkpointer
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output
+  copy_dir: /copy
+  strip_prefix: _orig_mod.
+
+############################################
+#                 Eval                     #
+############################################
+
+test_eval:
+  output_path: null 
+  ckpt_path: #/output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/87193.pt
+    ############ pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b ###############
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/10894/10894.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/16341/16341.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/21788/21788.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/27235/27235.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/32682/32682.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/38129/38129.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/43576/43576.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/49023/49023.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/5447/5447.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/54470/54470.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/59917/59917.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/65364/65364.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/70811/70811.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/76258/76258.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/81705/81705.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/87152/87152.pt
+    #- /output/pretrain-v2-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/87193/87193.pt
+    ################ pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/10894/10894.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/16341/16341.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/21788/21788.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/27235/27235.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/32682/32682.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/38129/38129.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/43576/43576.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/49023/49023.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/5447/5447.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/54470/54470.pt
+    #- /output/pretrain-v3dot1-01-17-25-phase1-model-llama1b-data-phase1b/checkpoints/59917/59917.pt
+     
+    ############### /output/pretrain-phase1-model-llama1b-data-phase1b 10k rope base
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/10894/10894.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/16341/16341.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/21788/21788.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/27235/27235.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/32682/32682.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/38129/38129.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/43576/43576.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/49023/49023.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/5447/5447.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/54470/54470.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/59917/59917.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/65364/65364.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/70811/70811.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/76258/76258.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/81705/81705.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/87152/87152.pt
+    #- /output/pretrain-phase1-model-llama1b-data-phase1b/checkpoints/87193/87193.pt
+
+    #- /output/pretrain-01-21-25-phase1-model-llama1b-data-web-and-books/checkpoints/5447/5447.pt
+    #- /output/pretrain-01-21-25-phase1-model-llama1b-data-web-and-books/checkpoints/10894/10894.pt
+    #- /output/pretrain-01-21-25-phase1-model-llama1b-data-web-and-books/checkpoints/16341/16341.pt
+    #- /output/pretrain-01-21-25-phase1-model-llama1b-data-web-and-books/checkpoints/21788/21788.pt
+    # - /output/pretrain-01-21-25-phase1-model-llama1b-data-web-only/checkpoints/32682/32682.pt
+    # - /output/pretrain-01-21-25-phase1-model-llama1b-data-web-only/checkpoints/27235/27235.pt
+    # - /output/pretrain-01-21-25-phase1-model-llama1b-data-web-only/checkpoints/21788/21788.pt
+    #- /output/pretrain-01-21-25-phase1-model-llama1b-data-web-only/checkpoints/16341/16341.pt
+    #- /output/pretrain-01-21-25-phase1-model-llama1b-data-web-only/checkpoints/10894/10894.pt
+    #- /output/pretrain-01-21-25-phase1-model-llama1b-data-web-only/checkpoints/5447/5447.pt
+
+    - /output/pretrain-phase2-v2-cust-mix-01-21-25/checkpoints/21798/21798.pt
+    #- /output/pretrain-phase2-v2-cust-mix-01-21-25/checkpoints/21788/21788.pt
+    - /output/pretrain-phase2-v2-cust-mix-01-21-25/checkpoints/16341/16341.pt
+    - /output/pretrain-phase2-v2-cust-mix-01-21-25/checkpoints/10894/10894.pt
+    - /output/pretrain-phase2-v2-cust-mix-01-21-25/checkpoints/5447/5447.pt
+
+
+
+  tokenizer:
+    id: tiktoken
+    args: {}
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  tasks:
+    <<: *signal_at_1b_eval_tasks

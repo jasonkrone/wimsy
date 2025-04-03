@@ -1,0 +1,97 @@
+# contains the 2B variants 
+
+
+#############################################################
+#                       Phase 2BBase                        #
+#############################################################
+
+
+pretrain_phase_2b_base_train_mix: &pretrain_phase_2b_base_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 3584772
+  - local: /data/starcoder/train
+    choose: 2929688
+  - local: /data/open-web-math/train
+    choose: 3515625
+  - local: /data/algebraic-stack/train
+    choose: 878907
+ 
+pretrain_phase_2b_base_dev_mix: &pretrain_phase_2b_base_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/dev
+    proportion: 1
+  - local: /data/starcoder/dev
+    proportion: 1
+  - local: /data/open-web-math/dev
+    proportion: 1
+  - local: /data/algebraic-stack/dev
+    proportion: 1
+  
+
+##############################################################
+##                       Phase 2Custom                       #
+##############################################################
+
+
+pretrain_phase_2b_custom_train_mix: &pretrain_phase_2b_custom_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 1220704
+  - local: /data/amps/train
+    choose: 93669
+  - local: /data/mathcoder2-synthmath/train
+    choose: 489058
+  - local: /data/tulu-math/train
+    choose: 27625
+  - local: /data/flan/train
+    choose: 610352
+
+
+pretrain_phase_2b_custom_dev_mix: &pretrain_phase_2b_custom_dev_mix 
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    proportion: 1
+  - local: /data/amps/train
+    proportion: 1
+  - local: /data/mathcoder2-synthmath/train
+    proportion: 1
+  - local: /data/tulu-math/train
+    proportion: 1
+  - local: /data/flan/train
+    proportion: 1
+
+
+
+##############################################################
+##                       Phase 2BMath                        #
+##############################################################
+#
+#
+#pretrain_phase_2b_math_train_mix: &pretrain_phase_2b_math_train_mix
+#  
+#
+#pretrain_phase_2b_math_dev_mix: &pretrain_phase_2b_math_dev_mix
+#  
+
+
+
+##############################################################
+##                       Phase 2BFlan                        #
+##############################################################
+#
+#pretrain_phase_2b_flan_train_mix: &pretrain_phase_2b_flan_train_mix
+#  
+#
+#pretrain_phase_2b_flan_dev_mix: &pretrain_phase_2b_flan_dev_mix
+#  
+#
+##############################################################
+##                       Phase 2BWiki                        #
+##############################################################
+#
+#pretrain_phase_2b_wiki_train_mix: &pretrain_phase_2b_wiki_train_mix
+#  
+#pretrain_phase_2b_wiki_dev_mix: &pretrain_phase_2b_wiki_dev_mix
+#  
+#

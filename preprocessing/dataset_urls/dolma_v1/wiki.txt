@@ -1,0 +1,6 @@
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/wiki-en-simple/en_simple_wiki-0000.json.gz
+ dir=./dolma/wiki_en_simple
+ out=en_simple_wiki-0000.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/wiki-en-simple/en_simple_wiki-0001.json.gz
+ dir=./dolma/wiki_en_simple
+ out=en_simple_wiki-0001.json.gz

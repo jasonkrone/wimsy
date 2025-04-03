@@ -1,0 +1,118 @@
+wandb:
+  project_name: baseline_dev_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+eval_vars:
+  do_apply_chat_template: &do_apply_chat_template False
+  ifeval_max_gen_toks: &ifeval_max_gen_toks 1792
+
+include: configs/eval/dev_eval/_dev_eval_tasks_yaml
+
+baselines:
+  ########################################################################################
+  #                                     Base Models                                      #
+  ########################################################################################
+
+  ########### pythia 1.4B ##########
+  #pythia-1-dot-4b-deduped-27b-toks:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step13000
+  #pythia-1-dot-4b-deduped-48b-toks:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step23000
+  #pythia-1-dot-4b-deduped-69b-toks:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step33000
+  #pythia-1-dot-4b-deduped-111b-toks:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step53000
+  #pythia-1-dot-4b-deduped-300b-toks:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped
+
+  ############ OLMo 1B ##########
+  #olmo-1b:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-1B-hf
+
+  olmo_1b_toks_21b:
+    id: hf
+    args: pretrained=jasonkrone/olmo_1b_toks_21b,tokenizer=allenai/OLMo-1B-hf
+
+  olmo_1b_toks_50b:
+    id: hf
+    args: pretrained=jasonkrone/olmo_1b_toks_50b,tokenizer=allenai/OLMo-1B-hf
+
+  olmo_1b_toks_75b:
+    id: hf
+    args: pretrained=jasonkrone/olmo_1b_toks_75b,tokenizer=allenai/OLMo-1B-hf
+
+  olmo_1b_toks_126:
+    id: hf
+    args: pretrained=jasonkrone/olmo_1b_toks_126,tokenizer=allenai/OLMo-1B-hf
+
+  ############# OpenELM ##########
+  #open_elm_1_dot_1b:
+  #  id: hf
+  #  args: pretrained=jasonkrone/OpenELM-1_1B-fix-nan,trust_remote_code=True,add_bos_token=True,tokenizer=meta-llama/Llama-2-7b-hf
+
+  ############## Tiny Llama ##########
+  #tiny-llama-1-dot-1b-503b-toks:
+  #  id: hf
+  #  args: pretrained=TinyLlama/TinyLlama-1.1B-intermediate-step-240k-503b
+
+  ############# pythia 6.9B ##########
+  #pythia-6-dot-9b-deduped-153b-toks:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-6.9b-deduped,revision=step73000
+  #pythia-6-dot-9b-deduped-300b-toks:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-6.9b-deduped
+
+  ############## Llama-1 ##########
+  #llama-1-7b:
+  #  id: hf
+  #  args: pretrained=huggyllama/llama-7b
+
+  ############# OLMo 7b ##########
+  #olmo-7b:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-7B-hf
+ 
+  #olmo_7b_toks_168b:
+  #  id: hf
+  #  args: pretrained=jasonkrone/olmo_7b_toks_168b,tokenizer=allenai/OLMo-7B-hf
+
+  #olmo_7b_toks_302b:
+  #  id: hf
+  #  args: pretrained=jasonkrone/olmo_7b_toks_302b,tokenizer=allenai/OLMo-7B-hf
+
+  #olmo_7b_toks_449b:
+  #  id: hf
+  #  args: pretrained=jasonkrone/olmo_7b_toks_449b,tokenizer=allenai/OLMo-7B-hf
+
+  #olmo_7b_toks_600b:
+  #  id: hf
+  #  args: pretrained=jasonkrone/olmo_7b_toks_600b,tokenizer=allenai/OLMo-7B-hf
+
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  clear_cache: True
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baselines
+  tasks:
+    <<: *multi_choice_dev_eval_tasks
+  

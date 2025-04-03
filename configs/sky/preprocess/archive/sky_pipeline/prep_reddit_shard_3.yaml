@@ -1,0 +1,32 @@
+name: prep-reddit-shard3
+
+resources:
+  cloud: aws
+  instance_type: i3.16xlarge
+  disk_size: 800
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+file_mounts:
+  /artifacts:
+    source: s3://jpt-artifacts
+    mode: COPY
+
+workdir: ~/Developer/jpt
+
+setup: |
+  echo "setup"
+
+run: |
+  cd ~/sky_workdir
+  requirements_path="requirements/data_requirements.txt"
+  env_name="prep_data"
+  source ./bash/setup.sh; activate_or_create_conda_env $env_name $requirements_path
+  
+  sudo chmod go+rw /artifacts
+  
+  #aws s3 cp --recursive s3://reddit-split-shard-3-of-4 /home/ubuntu/data/reddit-split/shard-3-of-4
+  
+  config_dir=./configs/preprocess/ctx_len_4096_tokenizer_tiktoken_memmap
+  
+  source keys.env; python -m preprocessing.prep_data --config $config_dir/prep_reddit.yaml

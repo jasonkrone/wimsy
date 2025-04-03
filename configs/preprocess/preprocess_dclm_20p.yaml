@@ -1,0 +1,36 @@
+
+substitutions:
+  dataset: dclm-baseline-20p
+  source_extension: jsonl.zstd
+
+vars:
+  cleanup: &do_cleanup True
+  is_distributed: &is_distributed True
+ 
+  downloader:
+    urls_path: &urls_path ./preprocessing/dataset_urls/dclm_baseline/dclm_baseline_20p.txt
+    num_shards: &num_shards 16
+    source_location: &source_location s3
+
+  elastic_search_indexer:
+    num_documents_to_index: &num_documents_to_index null 
+
+  contaminated_span_tagger:
+    ngrams_path: &ngrams_path /sky_workdir/test_and_dev_13_grams.jsonl.gz
+
+  decontaminator:
+    drop_entire_doc: &drop_entire_doc True
+    drop_doc_contamination_threshold: &drop_doc_contamination_threshold 1.0
+  
+  map_jsonl:
+    keys_to_remove: &keys_to_remove
+      - metadata
+      - language_id_whole_page_fasttext
+
+  split_maker:
+    # TODO: you gotta change this for each dataset
+    # list here: https://docs.google.com/spreadsheets/d/1Gc2RKYD6QuzXwG0Vj54VQxRYxXcydTu9QxV8zEHrJAE/edit#gid=0
+    avg_num_tokens_per_doc: &avg_num_tokens_per_doc 930
+    dev_size: &dev_size 5000
+
+include: _prep_dclm_template_yaml 

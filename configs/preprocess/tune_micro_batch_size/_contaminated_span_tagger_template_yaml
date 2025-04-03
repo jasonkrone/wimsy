@@ -1,0 +1,70 @@
+template_vars:
+  num_processes: &num_processes 64
+  context_len: &context_len 4096
+
+  downloader:
+    download_destination: &download_destination /local_out/download-$dataset/documents
+
+  elastic_search_base_args: &es_args
+    index_name: &index_name $dataset
+    hosts:
+      - http://elasticsearch:9200
+    request_timeout: 600
+    max_retries: 10
+    pbar_interval: 100_000
+    num_processes: *num_processes
+
+  elastic_search_indexer:
+    source_glob: &indexer_source_glob /local_out/download-$dataset/documents/*/*.$source_extension
+    chunk_size: &chunk_size_to_index 500 
+    property_to_jsonpath: &property_to_jsonpath
+      id: url
+      text: text
+      created: metadata.WARC-Date
+      source: source
+
+  contaminated_span_tagger:
+    ckpt_interval: &ckpt_interval 1_000_000
+
+  decontaminator:
+    decontam_metadata: &decontam_metadata /local_out/decontam-$dataset-metadata
+ 
+  map_jsonl:
+    map_source: &map_source /local_out/download-$dataset/documents/*/*.$source_extension
+    map_destination: &map_destination /local_out/map-$dataset
+    map_metadata: &map_metadata /local_out/map-$dataset-metadata
+
+  split_maker:
+    split_source: &split_source /local_out/map-$dataset/*/*.$source_extension
+    split_destination: &split_destination /local_out/split-$dataset
+
+  split_writer:
+    tokenizer: &tokenizer
+      id: tiktoken
+      args: {}
+    property_to_default: &property_to_default
+      source: $dataset
+    # at 4096 seq length this is ~2.4k samples per chunk
+    num_tokens_per_chunk: &num_tokens_per_chunk 10_000_000
+    mds_size_limit: &mds_size_limit 130mb
+    # train
+    train_source: &train_source /local_out/split-$dataset/*/train/*.$source_extension
+    train_destination: &train_destination s3://$dataset-mds-decontam-ctx-4096-tokenizer-tiktoken/train
+    # dev
+    dev_source: &dev_source /local_out/split-$dataset/*/dev/*.$source_extension
+    dev_destination: &dev_destination s3://$dataset-mds-decontam-ctx-4096-tokenizer-tiktoken/dev
+
+
+pipeline:
+  - id: contaminated_span_tagger 
+    args:
+      <<: *es_args
+      num_ngrams: null 
+      micro_batch_size: null
+      ngram_queries_path: *ngram_queries_path
+      ngram_sources_path: *ngram_sources_path
+      metadata_prefix: *decontam_metadata
+      do_find_contaminated_spans: *do_find_contaminated_spans
+      round_to_delimiter: null
+      search_after_field: created
+      ckpt_interval: *ckpt_interval 

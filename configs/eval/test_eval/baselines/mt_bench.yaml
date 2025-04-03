@@ -1,0 +1,106 @@
+wandb:
+  project_name: baseline_eval
+  run_name: null
+
+compute:
+  device: null
+  is_distributed: True
+  world_size: 1
+
+baselines:
+
+    #######################################
+    #           best & worst pre-train    #
+    #######################################
+
+    # 2048
+    #olmo_1b_toks_21b:
+    #  id: hf
+    #  args: pretrained=jasonkrone/olmo_1b_toks_21b,tokenizer=allenai/OLMo-1B-hf
+
+    # 2048
+    #olmo_1b:
+    #  id: hf
+    #  args: pretrained=allenai/OLMo-1B-hf
+
+    #olmo_7b_toks_168b:
+    #  id: hf
+    #  args: pretrained=jasonkrone/olmo_7b_toks_168b,tokenizer=allenai/OLMo-7B-hf
+
+    ### 4096
+    #llama2:
+    #  id: hf
+    #  args: pretrained=meta-llama/Llama-2-7b-hf
+
+    #######################################
+    #           post-train 2048           #
+    #######################################
+
+    ######## OpenELM Instruct ##########
+    #open_elm_instruct_1_dot_1b:
+    #  id: hf
+    #  args: pretrained=jasonkrone/OpenELM-1_1B-instruct-fix-nan,trust_remote_code=True,add_bos_token=True,tokenizer=jasonkrone/OpenELM-Instruct-Tokenizer
+
+    ############ Tiny Instruct ##########
+    #tiny-llama-chat-1-dot-1b-503b-toks:
+    #  id: hf
+    #  args: pretrained=TinyLlama/TinyLlama-1.1B-Chat-v0.1,tokenizer=jasonkrone/TinyLlama-1.1B-Chat-v0.1-Tokenizer
+
+    ############# pythia 6.9B Instruct ##########
+    #pythia-6-dot-9b-tulu-v1-sft:
+    #  id: hf
+    #  args: pretrained=allenai/open-instruct-pythia-6.9b-tulu,tokenizer=jasonkrone/open-instruct-pythia-6.9b-tulu-tokenizer
+
+    ############ Llama-1 Instruct ##########
+    #llama-1-7b-tulu-v1-sft:
+    #  id: hf
+    #  args: pretrained=/artifacts/tulu-7b-recovered,tokenizer=jasonkrone/tulu-7b-tokenizer
+
+    ############ OLMo 7b Instruct ##########
+    #olmo-7b-tulu-v2-sft:
+    #  id: hf
+    #  args: pretrained=allenai/OLMo-7B-SFT,trust_remote_code=True
+
+    #olmo-7b-tulu-v2-instruct:
+    #  id: hf
+    #  args: pretrained=allenai/OLMo-7B-Instruct,trust_remote_code=True
+
+    ########################################
+    ##           post-train 4096           #
+    ########################################
+
+    #llama-2-7b-tulu-v2-sft:
+    #  id: hf
+    #  args: pretrained=allenai/tulu-2-7b
+
+    llama-2-7b-tulu-v2-instruct:
+      id: hf
+      args: pretrained=allenai/tulu-2-dpo-7b
+
+    #llama-2-7b-chat:
+    #  id: hf
+    #  args: pretrained=meta-llama/Llama-2-7b-chat-hf
+
+
+model:
+  id: null
+  args: null
+  name: null
+
+test_eval:
+  output_path: /output/baselines_09_12_24
+  limit: null
+
+mt_bench:
+  mode: single # "pairwise-baseline", "pairwise-all", "single"
+  questions_begin: null
+  questions_end: null
+  questions_path: /sky_workdir/FastChat/fastchat/llm_judge/data/mt_bench/question.jsonl
+  answers_path: null # TODO: this is where it's going to save the 
+  judge_prompts_path: /sky_workdir/FastChat/fastchat/llm_judge/data/judge_prompts.jsonl
+  judge_model: gpt-4
+  baseline_model: null
+  reference_answers_path: /sky_workdir/FastChat/fastchat/llm_judge/data/mt_bench/reference_answer/gpt-4.jsonl
+  max_new_tokens: 768 
+  num_choices: 1
+  num_workers: 1

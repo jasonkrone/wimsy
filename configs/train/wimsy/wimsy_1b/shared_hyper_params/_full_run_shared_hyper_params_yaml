@@ -1,0 +1,18 @@
+shared_hyper_params:
+
+  general:
+    gpu_type: &gpu_type H100_SXM_bf16 
+
+  iters:
+    batch_size: &batch_size 7
+
+  intervals:
+    ckpt_interval: &ckpt_interval 5447 # every 2.5B tokens assuming BS 7 x 2 nodes x 8 GPUs per node
+    log_interval: &log_interval 250 # every ~3mins for a 1B model w/ BS 7
+    eval_interval: &eval_interval 5447 # eval once per ~1hr for 1B model w/ BS 7
+
+  dev_eval:
+    max_eval_iters: &max_eval_iters 200
+
+  data_loader:
+    num_workers: &num_workers 16

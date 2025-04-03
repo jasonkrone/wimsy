@@ -1,0 +1,8 @@
+task: mt_bench_decontam
+dataset_path: jasonkrone/mt_bench
+output_type: generate_until
+test_split: test
+should_decontaminate: true
+doc_to_text: ""
+doc_to_decontamination_query: !function utils.doc_to_decontamination_query
+doc_to_target: ""

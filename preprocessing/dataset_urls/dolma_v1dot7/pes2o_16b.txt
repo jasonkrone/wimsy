@@ -1,0 +1,8 @@
+https://olmo-data.org/dolma-v1_7/pes2o/pes2o-0017.json.gz
+https://olmo-data.org/dolma-v1_7/pes2o/pes2o-0011.json.gz
+https://olmo-data.org/dolma-v1_7/pes2o/pes2o-0023.json.gz
+https://olmo-data.org/dolma-v1_7/pes2o/pes2o-0020.json.gz
+https://olmo-data.org/dolma-v1_7/pes2o/pes2o-0003.json.gz
+https://olmo-data.org/dolma-v1_7/pes2o/pes2o-0001.json.gz
+https://olmo-data.org/dolma-v1_7/pes2o/pes2o-0018.json.gz
+https://olmo-data.org/dolma-v1_7/pes2o/pes2o-0024.json.gz

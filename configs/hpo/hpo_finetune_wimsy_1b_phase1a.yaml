@@ -1,0 +1,56 @@
+##########################################
+#            Run specific params          #
+##########################################
+
+hpo:
+  num_hpo_trials: 16
+  config_updater:
+    id: lr_schedule_updater
+
+hyper_params:
+
+  trainer_id: &trainer_id trainer
+
+  tokenizer: &tokenizer
+    id: tiktoken
+    args: {}
+
+  proccess_group:
+    init_process_group_at_start: &init_process_group_at_start False
+    shutdown_distributed_processes_at_end: &shutdown_distributed_processes_at_end False
+
+##########################################
+#                 Imports                #
+##########################################
+
+include: configs/train/wimsy/wimsy_1b/architectures/_llama_1b_architecture_yaml
+include: configs/hpo/_shared_hpo_finetune_hyper_params_yaml
+include: configs/finetune/_finetune_template_yaml
+
+##########################################
+#             Weights & Biases           #
+##########################################
+
+wandb:
+  project_name: wimsy_1b_phase_1a_finetune_lr_hpo
+  run_name: lr_search_finetune_wimsy_1b_phase1a_toks_40b
+
+############################################
+#              Checkpointing               #
+############################################
+
+ckpt:
+  strict: False
+  load_dataset_loader: False
+  save_best_model_at_end_for_eval: False # TODO: maybe u want this ... 
+  load_optimizer: False
+  resume_from_iter: null
+  resume_ckpt: /output/wimsy-llama-1b-model-phase1a-data-phase-1-hyperparams/checkpoints/87193_new_ckpt_format
+  checkpointer: fsdp_checkpointer
+  strip_prefix: _orig_mod.
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output
+  copy_dir: /copy
+  ckpt_interval: *ckpt_interval
+
+

@@ -1,0 +1,140 @@
+# see details here:
+# https://docs.google.com/spreadsheets/d/1rWi9oLMrGdHsVuJmX3trpOAM6nQJ5ju3TlcIj-lzHVk/edit?gid=1747714359#gid=1747714359
+# config values generated via make_data_mix_configs.ipynb
+
+#############################################################
+#                         Phase 1A                          #
+#############################################################
+
+
+pretrain_phase_1a_train_mix: &pretrain_phase_1a_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 4888777
+  - local: /data/dclm-top500b-gre-0.78-leq-0.88/train
+    choose: 5866320
+  - local: /data/dclm-top500b-gre-0.68-leq-0.78/train
+    choose: 6625479
+  - local: /data/dclm-top500b-gre-0.59-leq-0.68/train
+    choose: 7190937
+  - local: /data/dclm-top500b-gre-0.52-leq-0.59/train
+    choose: 985915
+  - local: /data/starcoder/train
+    choose: 14648438
+  - local: /data/open-web-math/train
+    choose: 6511231
+  - local: /data/algebraic-stack/train
+    choose: 1628418
+  - local: /data/arxiv/train
+    choose: 3254395
+  - local: /data/pes2o/train
+    choose: 3254395
+
+
+
+pretrain_phase_1a_dev_mix: &pretrain_phase_1a_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1
+  - local: /data/starcoder/dev
+    proportion: 1
+  - local: /data/open-web-math/dev
+    proportion: 1
+  - local: /data/algebraic-stack/dev
+    proportion: 1
+  - local: /data/arxiv/dev
+    proportion: 1
+  - local: /data/pes2o/dev
+    proportion: 1 
+
+
+#############################################################
+#                         Phase 1B                          #
+#############################################################
+
+
+pretrain_phase_1b_train_mix: &pretrain_phase_1b_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 4888777
+  - local: /data/dclm-top500b-gre-0.78-leq-0.88/train
+    choose: 5866320
+  - local: /data/dclm-top500b-gre-0.68-leq-0.78/train
+    choose: 6625479
+  - local: /data/dclm-top500b-gre-0.59-leq-0.68/train
+    choose: 7190937
+  - local: /data/dclm-top500b-gre-0.52-leq-0.59/train
+    choose: 7497146
+  - local: /data/starcoder/train
+    choose: 14648438
+  - local: /data/open-web-math/train
+    choose: 6511231
+  - local: /data/algebraic-stack/train
+    choose: 1628418
+
+
+pretrain_phase_1b_dev_mix: &pretrain_phase_1b_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1
+  - local: /data/starcoder/dev
+    proportion: 1
+  - local: /data/open-web-math/dev
+    proportion: 1
+  - local: /data/algebraic-stack/dev
+    proportion: 1
+
+
+#############################################################
+#                      Web + Books                          #
+#############################################################
+
+
+pretrain_web_and_books_train_mix: &pretrain_web_and_books_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 4888777
+  - local: /data/dclm-top500b-gre-0.78-leq-0.88/train
+    choose: 5866320
+  - local: /data/dclm-top500b-gre-0.68-leq-0.78/train
+    choose: 6625479
+  - local: /data/dclm-top500b-gre-0.59-leq-0.68/train
+    choose: 7190937
+  - local: /data/dclm-top500b-gre-0.52-leq-0.59/train
+    choose: 7497146
+  - local: /data/books/train # 12% approx matching the Pile
+    choose: 4882923
+
+pretrain_web_and_books_dev_mix: &pretrain_web_and_books_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1
+
+
+#############################################################
+#                         Web Only                          #
+#############################################################
+
+pretrain_web_train_mix: &pretrain_web_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 4888777
+  - local: /data/dclm-top500b-gre-0.78-leq-0.88/train
+    choose: 5866320
+  - local: /data/dclm-top500b-gre-0.68-leq-0.78/train
+    choose: 6625479
+  - local: /data/dclm-top500b-gre-0.59-leq-0.68/train
+    choose: 7190937
+  - local: /data/dclm-top500b-gre-0.52-leq-0.59/train
+    choose: 7497146
+
+pretrain_web_dev_mix: &pretrain_web_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+##########################################
+#                 Hardware               #
+##########################################
+compute:
+  device: cpu
+  is_distributed: False
+#########################################
+#                 Decoding              #
+#########################################
+decoding:
+  use_cache: True
+  decoding_algorithm: greedy_decoding
+  temperature: 1.0
+  out_len: 32
+  ckpt_path: /Users/jasonkrone/Developer/temp_ckpts/train_run_mini_jpt_nano_lr_warmup_12_14_23/299999.pt
+  tokenizer:
+    id: hf_auto_tokenizer
+    args:
+      pretrained_model_name_or_path: EleutherAI/gpt-neox-20b
+      use_fast: True
+      pad_token: <|padding|>
+
+#########################################
+#                 Model                 #
+#########################################
+
+model:
+  id: decoder_lm
+  parallelism: null
+  do_compile: False
+  use_meta_device: False
+  use_cache: False #True
+  precision: fp32 # bf16 # TODO: this might be screwing things up b/c casting may hurt performance
+  vocab_size: 50432
+  n_layers: 12
+  d_model: 768
+  n_heads: 12
+  attn: attn
+  mlp: mlp_swiglu
+  pos_encoding: identity
+  qk_encoding: rotary_encoding
+  rope_base: 10_000 # TODO: need to decide if you wanna keep that or nah
+  d_hidden: 2048
+  norm: rms_norm
+  max_len: 2048
+  p_dropout: 0.1
+  init_stdev: null
+  initializer: null

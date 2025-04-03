@@ -1,0 +1,37 @@
+name: tulu-v3-dpo-ai2-code 
+
+resources:
+  instance_type: p5.48xlarge
+  cloud: aws
+  region: us-east-2
+  zone: us-east-2a
+  image_id: ami-08df09d0c216570dd 
+
+num_nodes: 1
+
+file_mounts:
+  /output:
+    source: s3://wimsy
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+
+  env_name=tulu
+  conda create -n $env_name python=3.10 -y
+  conda activate $env_name
+  cd ~/sky_workdir/open-instruct
+  source ~/sky_workdir/bash/setup.sh ; install_tulu3_requirements
+  conda deactivate
+ 
+
+run: |
+
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  env_name=tulu
+
+  conda activate $env_name
+
+  source ~/sky_workdir/bash/run_training.sh; run_ai2_tulu_v3_dpo
+

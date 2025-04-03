@@ -1,0 +1,195 @@
+# Currently only contains the 2A variants 
+
+
+#############################################################
+#                       Phase 2ABase                        #
+#############################################################
+
+
+pretrain_phase_2a_base_train_mix: &pretrain_phase_2a_base_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 3584772
+  - local: /data/starcoder/train
+    choose: 2929688
+  - local: /data/open-web-math/train
+    choose: 1953125
+  - local: /data/algebraic-stack/train
+    choose: 488282
+  - local: /data/arxiv/train
+    choose: 976563
+  - local: /data/pes2o/train
+    choose: 976563
+
+
+pretrain_phase_2a_base_dev_mix: &pretrain_phase_2a_base_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1
+  - local: /data/starcoder/dev
+    proportion: 1
+  - local: /data/open-web-math/dev
+    proportion: 1
+  - local: /data/algebraic-stack/dev
+    proportion: 1
+  - local: /data/arxiv/dev
+    proportion: 1
+  - local: /data/pes2o/dev
+    proportion: 1
+
+
+#############################################################
+#                       Phase 2AMath                        #
+#############################################################
+
+
+pretrain_phase_2a_math_train_mix: &pretrain_phase_2a_math_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 3584772
+  - local: /data/starcoder/train
+    choose: 2929688
+  - local: /data/open-web-math/train
+    choose: 976563
+  - local: /data/algebraic-stack/train
+    choose: 244141
+  - local: /data/arxiv/train
+    choose: 488282
+  - local: /data/pes2o/train
+    choose: 488282
+  - local: /data/amps/train
+    choose: 337209
+  - local: /data/mathcoder2-synthmath/train
+    choose: 1760609
+  - local: /data/tulu-math/train
+    choose: 99449
+
+
+pretrain_phase_2a_math_dev_mix: &pretrain_phase_2a_math_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1.0
+  - local: /data/starcoder/dev
+    proportion: 1.0
+  - local: /data/open-web-math/dev
+    proportion: 1.0
+  - local: /data/algebraic-stack/dev
+    proportion: 1.0
+  - local: /data/arxiv/dev
+    proportion: 1.0
+  - local: /data/pes2o/dev
+    proportion: 1.0
+  - local: /data/amps/dev
+    proportion: 0.3333333333333333
+  - local: /data/mathcoder2-synthmath/dev
+    proportion: 0.3333333333333333
+  - local: /data/tulu-math/dev
+    proportion: 0.3333333333333333
+
+
+#############################################################
+#                       Phase 2AFlan                        #
+#############################################################
+
+pretrain_phase_2a_flan_train_mix: &pretrain_phase_2a_flan_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 2119928
+  - local: /data/starcoder/train
+    choose: 2929688
+  - local: /data/open-web-math/train
+    choose: 976563
+  - local: /data/algebraic-stack/train
+    choose: 244141
+  - local: /data/arxiv/train
+    choose: 488282
+  - local: /data/pes2o/train
+    choose: 488282
+  - local: /data/amps/train
+    choose: 337209
+  - local: /data/mathcoder2-synthmath/train
+    choose: 1760609
+  - local: /data/tulu-math/train
+    choose: 99449
+  - local: /data/flan/train
+    choose: 1464844
+
+
+pretrain_phase_2a_flan_dev_mix: &pretrain_phase_2a_flan_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1.0
+  - local: /data/starcoder/dev
+    proportion: 1.0
+  - local: /data/open-web-math/dev
+    proportion: 1.0
+  - local: /data/algebraic-stack/dev
+    proportion: 1.0
+  - local: /data/arxiv/dev
+    proportion: 1.0
+  - local: /data/pes2o/dev
+    proportion: 1.0
+  - local: /data/amps/dev
+    proportion: 0.3333333333333333
+  - local: /data/mathcoder2-synthmath/dev
+    proportion: 0.3333333333333333
+  - local: /data/tulu-math/dev
+    proportion: 0.3333333333333333
+  - local: /data/flan/dev
+    proportion: 1.0
+
+
+#############################################################
+#                       Phase 2AWiki                        #
+#############################################################
+
+pretrain_phase_2a_wiki_train_mix: &pretrain_phase_2a_wiki_train_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/train
+    choose: 3739447
+  - local: /data/dclm-top500b-gre-0.88-leq-0.97/train
+    choose: 1278888
+  - local: /data/starcoder/train
+    choose: 2929688
+  - local: /data/open-web-math/train
+    choose: 976563
+  - local: /data/algebraic-stack/train
+    choose: 244141
+  - local: /data/arxiv/train
+    choose: 488282
+  - local: /data/pes2o/train
+    choose: 488282
+  - local: /data/amps/train
+    choose: 337209
+  - local: /data/mathcoder2-synthmath/train
+    choose: 1760609
+  - local: /data/tulu-math/train
+    choose: 99449
+  - local: /data/flan/train
+    choose: 1464844
+  - local: /data/wiki/train
+    choose: 839844
+
+pretrain_phase_2a_wiki_dev_mix: &pretrain_phase_2a_wiki_dev_mix
+  - local: /data/dclm-top500b-gre-0.97-leq-1.00/dev
+    proportion: 1.0
+  - local: /data/starcoder/dev
+    proportion: 1.0
+  - local: /data/open-web-math/dev
+    proportion: 1.0
+  - local: /data/algebraic-stack/dev
+    proportion: 1.0
+  - local: /data/arxiv/dev
+    proportion: 1.0
+  - local: /data/pes2o/dev
+    proportion: 1.0
+  - local: /data/amps/dev
+    proportion: 0.3333333333333333
+  - local: /data/mathcoder2-synthmath/dev
+    proportion: 0.3333333333333333
+  - local: /data/tulu-math/dev
+    proportion: 0.3333333333333333
+  - local: /data/flan/dev
+    proportion: 1.0
+  - local: /data/wiki/dev
+    proportion: 1.0
+

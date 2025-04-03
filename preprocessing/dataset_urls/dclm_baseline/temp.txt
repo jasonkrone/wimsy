@@ -1,0 +1,9 @@
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000000_processed.jsonl.zstd
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000001_processed.jsonl.zstd
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000002_processed.jsonl.zstd
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000003_processed.jsonl.zstd
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000004_processed.jsonl.zstd
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000005_processed.jsonl.zstd
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000006_processed.jsonl.zstd
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000007_processed.jsonl.zstd
+s3://commoncrawl/contrib/datacomp/DCLM-baseline/global-shard_01_of_10/local-shard_1_of_10/shard_00000008_processed.jsonl.zstd

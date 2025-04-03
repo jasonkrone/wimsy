@@ -1,0 +1,26 @@
+name: mk-books-dev-split
+
+resources:
+  cloud: aws
+  instance_type: i3.8xlarge
+  disk_size: 600
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+setup: |
+    pip install -r requirements/requirements.txt
+
+workdir: ~/Developer/jpt
+
+run: |
+  cd ~/sky_workdir
+  
+  dataset="books"
+  input_dir="s3://jpt-data/dolma/tokenized/${dataset}"
+  output_dir="s3://jpt-data/dolma/tokenized/${dataset}"
+  config_path="./configs/preprocessing/prep_dolma.yaml"
+  
+  source keys.env; python -m preprocessing.make_dev_split \
+    --config $config_path \
+    --input_dir $input_dir \
+    --output_dir $output_dir

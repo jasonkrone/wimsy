@@ -1,0 +1,58 @@
+wandb:
+  project_name: scaling_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+include: configs/eval/scaling_eval/_scaling_law_eval_tasks_yaml
+
+# plan
+# [X] 1. add remaining tasks
+# [X] 2. review the models to use so we get a good sweep across PF-days 
+# [ ] 3. run all the things
+# [ ] 4. move over to SFT and DPO
+
+
+baselines:
+  ########################################################################################
+  #                                     Base Models                                      #
+  ########################################################################################
+  #olmo2-7b-toks-26b:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-2-1124-7B,revision=stage1-step6000-tokens26B
+  #olmo2-7b-toks-51b:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-2-1124-7B,revision=stage1-step12000-tokens51B
+  #olmo2-7b-toks-100b:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-2-1124-7B,revision=stage1-step24000-tokens101B
+  #olmo2-7b-toks-300b:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-2-1124-7B,revision=stage1-step72000-tokens302B
+  #olmo2-7b-toks-4000b:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-2-1124-7B
+
+  #llama3-8b-toks-15000b:
+  #  id: hf
+  #  args: pretrained=meta-llama/Meta-Llama-3-8B
+  
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  clear_cache: True
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baselines
+  tasks:
+    <<: *scaling_law_eval_tasks
+  

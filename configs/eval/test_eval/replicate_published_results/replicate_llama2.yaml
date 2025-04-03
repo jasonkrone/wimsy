@@ -1,0 +1,34 @@
+wandb:
+  project_name: baseline_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+baselines:
+  # hellaswag
+  replicate_llama2:
+    id: hf
+    args: pretrained=meta-llama/Llama-2-7b-hf
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baselines_07_30_24
+  tasks:
+    triviaqa_wiki:
+      shot: 5
+      batch_size: auto
+
+    #hellaswag:
+    #  shot: 0
+    #  batch_size: 16

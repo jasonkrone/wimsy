@@ -1,0 +1,33 @@
+name: train_mini_jpt
+
+resources:
+  accelerators: A100:8
+  cloud: aws
+  region: us-east-2
+  image_id: ami-063428ce3e73b179b #ami-0ea5e9630dcf98849
+
+workdir: ~/Developer/jpt
+
+file_mounts:
+  /output:
+    name: jpt-output
+    mode: MOUNT
+
+setup: |
+  sudo mkdir /output
+  cd ~/sky_workdir
+  pip install -r requirements/requirements.txt
+
+run: |
+    cd ~/sky_workdir
+    nproc_per_node=${SKYPILOT_NUM_GPUS_PER_NODE}
+    source keys.env; torchrun \
+      --standalone \
+      --nproc_per_node=$nproc_per_node \
+      training.train --config ./configs/train/train_100m_jpt.yaml
+    
+    # here's the eval 
+    #cd ~/sky_workdir/lm-evaluation-harness
+    #pip install -e .
+    #cd ~/sky_workdir
+    # HF_DATASETS_CACHE=~/.cache/huggingface/datasets python -m eval_wrapper --config ./configs/eval/eval_mini_jpt.yaml

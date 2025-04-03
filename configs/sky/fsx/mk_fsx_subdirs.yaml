@@ -1,0 +1,30 @@
+name: make-fsx-subdirs
+
+num_nodes: 1
+
+resources:
+  cloud: aws
+  instance_type: t2.large
+  region: us-east-1
+  image_id: ami-0772e0bfc7cc9c5de
+  # new image for P4, P5 etc.
+  #image_id: ami-0f3d58a48ca5d4dcc
+
+workdir: ~/Developer/jpt
+
+setup: |
+  ulimit -n 65536
+
+run: |
+  echo "running"
+  source bash/setup_fsx.sh ; mount_fsx
+
+  source ~/sky_workdir/keys.env; docker login -u jpolingkrone -p $DOCKER_PASSWORD
+
+  docker run \
+    -v ~/sky_workdir:/sky_workdir \
+    -v /mnt/fsx:/mnt/fsx \
+    jpolingkrone/jpt_prep_data:latest \
+    bash -c "cd /sky_workdir && python -m infra.mk_fsx_data_dirs --config ./configs/cloud_formation/fsx_data_sync_tasks.yaml"
+
+  source bash/setup_fsx.sh ; unmount_fsx

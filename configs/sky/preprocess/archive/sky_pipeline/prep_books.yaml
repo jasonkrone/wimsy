@@ -1,0 +1,130 @@
+name: download-and-prep-books
+
+---
+
+name: download-books
+
+resources:
+  cloud: aws
+  instance_type: i3.8xlarge
+  disk_size: 600
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+setup: |
+    pip install -r requirements/requirements.txt
+
+workdir: ~/Developer/jpt
+
+run: |
+  cd ~/sky_workdir
+  
+  dataset="books"
+  output_dir="./dolma/${dataset}"
+  urls_path="./preprocessing/dolma_urls/v1_6/${dataset}.txt"
+  bucket_prefix="${dataset}-chunk"
+  bucket_prefix=$(echo "$bucket_prefix" | sed 's/_/-/g')
+  config_path="./configs/preprocess/prep_dolma.yaml"
+  
+  source keys.env; python -m preprocessing.download_data \
+    --config $config_path \
+    --output_dir $output_dir \
+    --urls_path $urls_path \
+    --bucket_prefix $bucket_prefix
+
+---
+
+name: preprocess-books
+
+resources:
+  cloud: aws
+  instance_type: i3.8xlarge
+  disk_size: 600
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+setup: |
+    pip install -r requirements/requirements.txt
+
+workdir: ~/Developer/jpt
+
+run: |
+  cd ~/sky_workdir
+  
+  dataset="books"
+  dataset_name_or_dir="s3://${dataset}-chunk-*"
+  output_dir="s3://jpt-data/dolma/tokenized/${dataset}"
+  config_path="./configs/preprocess/prep_dolma.yaml"
+    
+  source keys.env; python -m preprocessing.prep_data \
+    --config $config_path \
+    --dataset_name_or_dir $dataset_name_or_dir \
+    --output_dir $output_dir
+
+---
+
+name: mk-books-dev-split
+
+resources:
+  cloud: aws
+  instance_type: i3.8xlarge
+  disk_size: 600
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+setup: |
+    pip install -r requirements/requirements.txt
+
+workdir: ~/Developer/jpt
+
+run: |
+  cd ~/sky_workdir
+  
+  dataset="books"
+  input_dir="s3://jpt-data/dolma/tokenized/${dataset}"
+  output_dir="s3://jpt-data/dolma/tokenized/${dataset}"
+  config_path="./configs/preprocess/prep_dolma.yaml"
+  
+  source keys.env; python -m preprocessing.make_dev_split \
+    --config $config_path \
+    --input_dir $input_dir \
+    --output_dir $output_dir
+
+---
+
+name: convert-books-to-mds
+
+resources:
+  cloud: aws
+  instance_type: i3.8xlarge
+  disk_size: 600
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+setup: |
+    pip install -r requirements/requirements.txt
+
+workdir: ~/Developer/jpt
+
+run: |
+  cd ~/sky_workdir
+  
+  dataset="books"
+  input_dir="s3://jpt-data/dolma/tokenized/${dataset}"
+  train_output_dir="s3://jpt-data/dolma/tokenized/${dataset}-mds/train"
+  dev_output_dir="s3://jpt-data/dolma/tokenized/${dataset}-mds/dev"
+  config_path="./configs/preprocess/prep_dolma.yaml"
+ 
+  python -m preprocessing.memmap_to_mds \
+    --config $config_path \
+    --input_dir $input_dir \
+    --output_dir $train_output_dir \
+    --file_name_glob "*train*.bin" \
+    --source_id $dataset
+    
+  python -m preprocessing.memmap_to_mds \
+    --config $config_path \
+    --input_dir $input_dir \
+    --output_dir $dev_output_dir \
+    --file_name_glob "*dev*.bin" \
+    --source_id $dataset

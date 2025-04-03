@@ -1,0 +1,2 @@
+{"id":"test1","dataset":"synthetic_test","split":"na","index":0,"ngrams":["words that come first should be dropped completely and words that come after"]}
+{"id":"test2","dataset":"synthetic_test","split":"na","index":1,"ngrams":["my name is bob and i love pools and farms and dogs smiling"]}

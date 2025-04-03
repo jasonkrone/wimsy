@@ -1,0 +1,154 @@
+wandb:
+  project_name: baseline_eval
+  run_name: random_baseline
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+ckpt:
+  # TODO: would be nice to have an option where when this is just left as the ckpt root it auto adds the run name
+  checkpointer: fsdp_checkpointer
+  resume_ckpt: True # resume the latest checkpoint in checkpoint dir
+  strip_prefix: _orig_mod.
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output/exp_0/
+  copy_dir: /copy/exp_0/
+  ckpt_interval: 1000 # 5000
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: decoder_lm
+  use_compile_profiler: False
+  do_offload_activations: False
+  use_meta_device: True
+  use_cache: True
+  do_compile: True
+  parallelism: fsdp_model
+  initializer: null
+  precision: bf16 # TODO: this should really be mixed precision & then we should have optimizer stuff as fp32
+  vocab_size: 100277
+  n_layers: 1
+  d_model: 2
+  n_heads: 1
+  d_hidden: 4
+  max_len: &context_len 4096
+  attn: attn # TODO: could this actually be slower for forward?
+  mlp: mlp_swiglu
+  norm: rms_norm
+  pos_encoding: identity
+  qk_encoding: rotary_encoding
+  rope_base: 10_000 # TODO: need to decide if you wanna keep that or nah
+  p_dropout: 0.1
+  init_stdev: null
+
+# TODO: this random is bad for generative tasks
+
+test_eval:
+  ckpt_path: /output/baselines_07_08_24/random/checkpoints/0/0.pt
+  output_path: /output/baselines_08_20_24/random
+  tokenizer:
+    id: tiktoken
+    args: {}
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  tasks:
+    #arc_easy:
+    #  shot: 0
+    #  batch_size: auto
+    #arc_challenge:
+    #  shot: 0
+    #  batch_size: auto
+    # generative
+    # TODO: doesn't make sense
+    #bbh_cot_fewshot:
+    #  shot: 3
+    #  batch_size: 16
+    #  gen_kwargs:
+    #    max_gen_toks: 32
+    #    until:
+    #      - "</s>"
+    #      - "Q"
+    #      - "\n\n"
+    #    do_sample: false
+    #    temperature: 0.0
+    #boolq:
+    #  shot: 0
+    #  batch_size: auto
+    # generative
+    # TODO: CHANGED to multiple choice
+    #commonsense_qa_cot_fewshot:
+    #commonsense_qa:
+    #  shot: 7
+    #  batch_size: auto
+    # generative
+    # TODO: doesn't make sense b/c it's just generate answer
+    #drop:
+    #  shot: 3
+    #  batch_size: 1
+    # TODO: changed to multiple choice version
+    #gpqa_main_cot_zeroshot:
+    #gpqa_main_zeroshot:
+    #  shot: 0
+    #  batch_size: auto
+    # generative
+    # TODO: doesn't make sense but we can try
+    #gsm8k_cot:
+    #  shot: 8
+    #  batch_size: auto
+    #hellaswag:
+    #  shot: 10
+    #  batch_size: auto
+    # generative
+    # TODO: doesn't make sense
+    #humaneval_greedy:
+    #  shot: 0
+    #  batch_size: auto
+    # generative
+    ifeval:
+      shot: 0
+      batch_size: auto
+      gen_kwargs:
+        until: [ ]
+        do_sample: false
+        temperature: 0.0
+        max_gen_toks: 3840
+    #lambada_openai:
+    #  shot: 0
+    #  batch_size: auto
+    ## generative
+    ## TODO: doesn't make sense
+    #minerva_math:
+    #  shot: 4
+    #  batch_size: auto
+    #mmlu:
+    #  shot: 5
+    #  batch_size: auto
+    #openbookqa:
+    #  shot: 0
+    #  batch_size: auto
+    #piqa:
+    #  shot: 0
+    #  batch_size: auto
+    #race_h_all_questions:
+    #  shot: 0
+    #  batch_size: auto
+    # generative
+    # TODO: doesn't make sense b/c it's answering open ended qs
+    #triviaqa_wiki:
+    #  shot: 5
+    #  batch_size: auto
+    #winogrande:
+    #  shot: 5
+    #  batch_size: auto
+    # TODO: need to look more into what mc2 is
+    truthfulqa_mc2:
+      shot: 0
+      batch_size: auto
+    # generative
+    ##realtoxicityprompts:
+    ##  shot: 0
+    ##  batch_size: auto

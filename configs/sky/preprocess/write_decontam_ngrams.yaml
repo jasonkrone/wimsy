@@ -1,0 +1,31 @@
+name: make-decontam-ngrams
+
+num_nodes: 1
+
+resources:
+  cloud: aws
+  instance_type: i3.16xlarge
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+workdir: ~/Developer/jpt
+
+setup: |
+  # setup elastic search and output dirs
+  dir_list=(/es /local_out)
+  for dir in "${dir_list[@]}"; do
+    sudo mkdir -p $dir
+    sudo chown -R 1000:0 $dir
+    sudo chmod -R 777 $dir
+  done
+
+run: |
+  ## get elastic search running
+  compose_path=./docker/data_prep/docker_compose.yaml
+  docker compose -f $compose_path up -d
+  sleep 15
+
+  ## run data prep
+  config_path=./configs/preprocess/write_eval_ngrams.yaml
+  docker compose -f $compose_path exec jpt_prep_data bash -c "cd /sky_workdir && source keys.env ; python -m preprocessing.prep_data --config $config_path"
+  docker compose -f $compose_path down

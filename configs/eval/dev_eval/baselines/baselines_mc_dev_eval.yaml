@@ -1,0 +1,93 @@
+include: configs/eval/dev_eval/_dev_eval_tasks_yaml
+
+wandb:
+  project_name: dev_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+baselines:
+
+  ########### pythia 1.4B ##########
+  #pythia-1-dot-4b-deduped-27b-toks-dev:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step13000
+  # TODO: i should probably fine tune this one!!!!!!!
+  #pythia_1dot4b_toks_48b_dev:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step23000
+  #pythia-1-dot-4b-deduped-69b-toks-dev:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step33000
+  #pythia-1-dot-4b-deduped-111b-toks-dev:
+  #  id: hf
+  #  args: pretrained=EleutherAI/pythia-1.4b-deduped,revision=step53000
+
+
+  ########### pythia 1.4B fine-tuned ##########
+
+  #pythia-1-dot-4b-48b-toks-finetune-all-tasks:
+  #  id: hf # bfloat16
+  #  args: pretrained=jasonkrone/pythia-1-dot-4b-48b-toks-all-tasks_4way_mc_train_10k_per_task-3k-iters,tokenizer=EleutherAI/pythia-1.4b-deduped
+
+  #pythia_1dot4b_toks_27b_dev_finetune:
+  #  id: hf
+  #  args: pretrained=jasonkrone/pythia-1-dot-4b-deduped-27b-toks-try2-mc-finetune-hpo-lr-with-mmlu,tokenizer=EleutherAI/pythia-1.4b-deduped
+
+  #pythia_1dot4b_toks_69b_dev_finetune:
+  #  id: hf
+  #  args: pretrained=jasonkrone/pythia-1-dot-4b-deduped-69b-toks-mc-finetune-hpo-lr-with-mmlu,tokenizer=EleutherAI/pythia-1.4b-deduped
+  
+  #pythia_1dot4b_toks_111b_dev_finetune:
+  #  id: hf
+  #  args: pretrained=jasonkrone/pythia-1-dot-4b-deduped-111b-toks-mc-finetune-hpo-lr-with-mmlu,tokenizer=EleutherAI/pythia-1.4b-deduped
+
+
+  ########### OLMo 1B ##########
+  #olmo_1b_toks_21b_dev:
+  #  id: hf
+  #  args: pretrained=jasonkrone/olmo_1b_toks_21b,tokenizer=allenai/OLMo-1B-hf
+
+  #olmo_1b_toks_50b_dev:
+  #  id: hf
+  #  args: pretrained=jasonkrone/olmo_1b_toks_50b,tokenizer=allenai/OLMo-1B-hf
+
+  #olmo_1b_toks_75b_dev:
+  #  id: hf
+  #  args: pretrained=jasonkrone/olmo_1b_toks_75b,tokenizer=allenai/OLMo-1B-hf
+
+  #olmo_1b_toks_126_dev:
+  #  id: hf
+  #  args: pretrained=jasonkrone/olmo_1b_toks_126,tokenizer=allenai/OLMo-1B-hf
+
+  ########### OLMo 1B fine-tuned ##########
+
+  olmo_1b_toks_50b_dev_finetune:
+    id: hf
+    args: pretrained=jasonkrone/olmo_1b_toks_50b-mc-finetune-hpo-lr-with-mmlu,tokenizer=allenai/OLMo-1B-hf
+
+  olmo_1b_toks_75b_dev_finetune:
+    id: hf
+    args: pretrained=jasonkrone/olmo_1b_toks_75b-mc-finetune-hpo-lr-with-mmlu,tokenizer=allenai/OLMo-1B-hf
+  
+  olmo_1b_toks_126b_dev_finetune:
+    id: hf
+    args: pretrained=jasonkrone/olmo_1b_toks_126-mc-finetune-hpo-lr-with-mmlu,tokenizer=allenai/OLMo-1B-hf
+
+
+# model info will be set by scripts
+model:
+  id: null
+  args: null
+
+test_eval:
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baseline_dev_eval_01_12_25
+  tasks:
+    <<: *multi_choice_dev_eval_tasks

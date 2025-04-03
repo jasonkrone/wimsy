@@ -1,0 +1,20 @@
+name: capacity-res-head-node
+
+resources:
+  instance_type: m5.8xlarge
+  cloud: aws
+  region: us-east-1
+  zone: us-east-1f
+
+# in ~/.sky/config.yaml i was able to specify the use_internal_ips ... etc.
+# VPC name etc.
+
+num_nodes: 1
+
+workdir: ~/Developer/jpt
+
+setup:
+  echo "setup"
+
+run: |
+  echo "running"

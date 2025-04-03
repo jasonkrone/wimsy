@@ -1,0 +1,21 @@
+task: math_mc_hpo
+dataset_path: jasonkrone/math_mc_with_dev_hpo
+dataset_name: null
+output_type: multiple_choice
+training_split: train
+validation_split: dev_hpo
+target_delimiter: " "
+doc_to_text: "Question: {{Question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer:"
+doc_to_target: "{{Answer}}"
+doc_to_choice: ["A", "B", "C", "D"]
+should_decontaminate: true
+doc_to_decontamination_query: "{{Question}}"
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_norm
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0

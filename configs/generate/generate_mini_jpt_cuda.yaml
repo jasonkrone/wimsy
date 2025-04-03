@@ -1,0 +1,40 @@
+##########################################
+#                 Hardware               #
+##########################################
+compute:
+  device: cuda
+  is_distributed: False
+#########################################
+#                 Decoding              #
+#########################################
+decoding:
+  use_cache: True
+  decoding_algorithm: greedy_decoding
+  temperature: 1.0
+  out_len: 32
+  ckpt_path: /output/train_run_mini_jpt_100m_02_14_24_dryrun/checkpoints/4.pt
+
+#########################################
+#                 Model                 #
+#########################################
+
+model:
+  precision: bf16 # TODO: this might be screwing things up b/c casting may hurt performance
+  vocab_size: 50432
+  n_layers: 12
+  d_model: 768
+  n_heads: 12
+  attn: flash_attn
+  mlp: mlp_swiglu
+  pos_encoding: null
+  qk_encoding: rotary_encoding
+  d_hidden: 2048
+  max_len: 2048
+  p_dropout: 0.1
+  init_stdev: 0.02
+
+###########################################
+#               Data Loader               #
+###########################################
+data:
+  tokenizer_name: EleutherAI/gpt-neox-20b

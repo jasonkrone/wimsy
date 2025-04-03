@@ -1,0 +1,66 @@
+name: prep-c4-dist
+
+resources:
+  cloud: aws
+  instance_type: i3.16xlarge
+  disk_size: 800
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+num_nodes: 7
+
+file_mounts:
+  /artifacts:
+    source: s3://jpt-artifacts
+    mode: COPY
+
+workdir: ~/Developer/jpt
+
+setup: |
+  echo "setup"
+
+run: |
+  cd ~/sky_workdir
+  requirements_path="requirements/data_requirements.txt"
+  env_name="prep_data"
+  source ./bash/setup.sh; activate_or_create_conda_env $env_name $requirements_path
+  
+
+  #rank=$SKYPILOT_NODE_RANK
+  #if [ $rank -eq 0 ]; then
+  #  s3_dir=s3://c4-split-shard-3-of-5
+  #  local_dir=/home/ubuntu/data/c4-split/shard-3-of-5
+  #fi
+  #if [ $rank -eq 1 ]; then
+  #  s3_dir=s3://c4-split-shard-3-dot-5-of-5
+  #  local_dir=/home/ubuntu/data/c4-split/shard-3-dot-5-of-5
+  #fi
+  #if [ $rank -eq 2 ]; then
+  #  s3_dir=s3://c4-split-shard-4-of-5 
+  #  local_dir=/home/ubuntu/data/c4-split/shard-4-of-5
+  #fi
+  #if [ $rank -eq 3 ]; then
+  #  s3_dir=s3://c4-split-shard-4-dot-5-of-5 
+  #  local_dir=/home/ubuntu/data/c4-split/shard-4-dot-5-of-5
+  #fi
+  #if [ $rank -eq 4 ]; then
+  #  s3_dir=s3://c4-split-shard-1-of-5
+  #  local_dir=/home/ubuntu/data/c4-split/shard-1-of-5
+  #fi
+  #if [ $rank -eq 5 ]; then
+  #  s3_dir=s3://c4-split-shard-2-of-5
+  #  local_dir=/home/ubuntu/data/c4-split/shard-2-of-5
+  #fi
+  #if [ $rank -eq 6 ]; then
+  #  s3_dir=s3://c4-split-shard-5-of-5
+  #  local_dir=/home/ubuntu/data/c4-split/shard-5-of-5
+  #fi
+  #
+  #sudo chmod go+rw /artifacts
+  #
+  #mkdir -p /home/ubuntu/data/c4-split
+  #aws s3 cp $s3_dir $local_dir --recursive 
+  #
+  
+  config_dir=./configs/preprocess/ctx_len_4096_tokenizer_tiktoken_memmap
+  source keys.env; python -m preprocessing.prep_data --config $config_dir/prep_c4.yaml

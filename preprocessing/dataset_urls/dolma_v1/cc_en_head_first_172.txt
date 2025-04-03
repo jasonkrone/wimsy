@@ -1,0 +1,172 @@
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0000.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0000.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0001.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0001.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0002.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0002.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0003.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0003.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0004.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0004.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0005.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0005.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0006.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0006.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0007.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0007.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0008.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0008.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0009.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0009.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0010.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0010.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0011.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0011.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0012.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0012.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0013.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0013.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0014.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0014.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0015.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0015.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0016.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0016.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0017.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0017.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0018.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0018.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0019.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0019.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0020.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0020.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0021.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0021.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0022.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0022.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0023.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0023.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0024.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0024.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0025.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0025.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0026.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0026.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0027.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0027.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0028.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0028.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0029.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0029.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0030.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0030.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0031.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0031.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0032.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0032.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0033.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0033.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0034.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0034.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0035.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0035.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0036.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0036.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0037.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0037.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0038.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0038.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0039.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0039.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0040.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0040.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0041.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0041.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0042.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0042.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0043.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0043.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0044.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0044.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0045.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0045.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0046.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0046.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0047.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0047.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0048.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0048.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0049.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0049.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0050.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0050.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0051.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0051.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0052.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0052.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0053.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0053.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0054.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0054.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0055.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0055.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0056.json.gz
+  dir=./dolma/cc_en_head
+  out=cc_en_head-0056.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/common-crawl/cc_en_head/cc_en_head-0057.json.gz

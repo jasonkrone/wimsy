@@ -1,0 +1,66 @@
+name: wimsy-eval-eval-gpc-a100 
+
+resources:
+  accelerators: [A100-80GB:8, A100:8, A100-80GB:4, A100:4, A100-80GB:2, A100:2]
+  cloud: gcp
+  region: us-central1
+  image_id: projects/deeplearning-platform-release/global/images/pytorch-2-4-cu124-v20241118-debian-11-py310
+
+num_nodes: 1
+
+file_mounts:
+  /output:
+    source: s3://wimsy
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+
+  remote_sqsh_path="s3://jpt-apps/hpo_01_09_25.sqsh"
+
+  local_sqsh_path="/tmp/train.sqsh"
+  env_name=train_env
+
+  # updates fix some enroot issues on GCP
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt update -y && sudo apt upgrade -y
+
+  # install enroot
+  source ./bash/setup.sh; install_enroot
+
+  # install the AWS cli tool
+  sudo apt install -y unzip
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  sudo ./aws/install
+
+  # copy the sqsh file
+  echo "copying sqsh file"
+  aws s3 cp $remote_sqsh_path $local_sqsh_path
+
+  # create the enroot env 
+  echo "creating enroot env"
+  enroot create --name $env_name $local_sqsh_path
+
+
+run: |
+
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  env_name=train_env
+
+  config=./configs/eval/dev_eval/wimsy/wimsy_1b_phase1a_dev_eval.yaml
+
+  enroot start \
+    --rw \
+    --mount ~/sky_workdir:/sky_workdir \
+    --mount /tmp:/tmp \
+    --mount /output:/output \
+    --env SKYPILOT_NUM_NODES=$num_nodes \
+    --env SKYPILOT_NODE_IPS \
+    --env SKYPILOT_NUM_GPUS_PER_NODE \
+    --env SKYPILOT_NODE_RANK \
+    --env TRANSFORMERS_CACHE=/tmp/.cache \
+    $env_name \
+    /sky_workdir/bash/run_eval.sh evaluate $config
+

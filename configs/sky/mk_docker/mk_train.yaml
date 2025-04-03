@@ -1,0 +1,27 @@
+name: make-docker-train 
+
+num_nodes: 1
+
+resources:
+  cloud: aws
+  instance_type: t3.xlarge
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+workdir: ~/Developer/jpt
+
+setup: |
+  echo "setup"
+
+run: |
+  # source ./bash/setup.sh; install_enroot
+  cd ./docker
+
+  source keys.env; docker login -u jpolingkrone -p $DOCKER_PASSWORD
+
+  image_name=pt2dot6
+
+  docker build --progress=plain -t jpt:$image_name -f ./train_and_eval_v2/Dockerfile  .
+  enroot import -o ./$image_name.sqsh dockerd://jpt:$image_name
+  enroot create --name $image_name $image_name.sqsh
+  enroot start --rw --mount $image_name

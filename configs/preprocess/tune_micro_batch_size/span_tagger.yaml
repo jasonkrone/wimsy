@@ -1,0 +1,22 @@
+substitutions:
+  dataset: ngram-sweep
+  source_extension: jsonl.zstd
+
+vars:
+  cleanup: &do_cleanup False
+  is_distributed: &is_distributed False #True TODO: this is just for testing
+ 
+  downloader:
+    urls_path: &urls_path ./preprocessing/dataset_urls/dclm_baseline/dclm_baseline_10.txt # TODO this is just for testing 
+    num_shards: &num_shards 1 # TODO this is just for testing
+    source_location: &source_location s3 # TODO change back to s3
+
+  elastic_search_indexer:
+    num_documents_to_index: &num_documents_to_index null 
+
+  contaminated_span_tagger: 
+    ngram_queries_path: &ngram_queries_path /sky_workdir/ngram-queries--100k.jsonl
+    ngram_sources_path: &ngram_sources_path /sky_workdir/ngram-source-locations--ngram-size-8.json.gz
+    do_find_contaminated_spans: &do_find_contaminated_spans False
+
+include: _contaminated_span_tagger_template_yaml

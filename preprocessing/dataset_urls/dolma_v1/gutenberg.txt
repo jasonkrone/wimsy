@@ -1,0 +1,9 @@
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/gutenberg-books/books-0000.json.gz
+ dir=./dolma/gutenberg_books
+ out=books-0000.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/gutenberg-books/books-0001.json.gz
+ dir=./dolma/gutenberg_books
+ out=books-0001.json.gz
+https://huggingface.co/datasets/allenai/dolma/resolve/main/data/gutenberg-books/books-0002.json.gz
+ dir=./dolma/gutenberg_books
+ out=books-0002.json.gz

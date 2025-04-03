@@ -1,0 +1,118 @@
+##########################################
+#            Run specific params          #
+##########################################
+shared_hyper_params:
+
+  general:
+    seed: &seed 414
+    gpu_type: &gpu_type H100_SXM_bf16 
+
+  optimizer:
+    learning_rate: &learning_rate 0.000005  # 5e-6 * (n_nodes / 8) = 0.000000625 b/c they use the sum loss
+    beta_1: &beta_1 0.9
+    beta_2: &beta_2 0.95
+    epsilon: &epsilon 0.00000001
+
+  lr_schedule: &lr_schedule
+    id: linear_annealing_lr_schedule
+    args:
+      max_iters: 1.0
+      warmup_iters: 0.03
+      max_iter_units: percentage # max_iters will be set as a percentage of config.iters.max_iters
+      warmup_iter_units: percentage
+      lr_max: *learning_rate
+      lr_min: 0.0
+
+  loss:
+    max_grad_norm: &max_grad_norm 1.0
+    grad_accum_steps: &grad_accum_steps 16 # b/c 8 GPUs and per GPU bs of 1
+    per_grad_accum_step_loss_coef: &per_grad_accum_step_loss_coef 1.0
+
+    loss_fn: &loss_fn
+      id: cross_entropy
+      args:
+        reduction: sum
+
+  regularization:
+    weight_decay: &weight_decay 0.0
+    early_stopping_patience: &early_stopping_patience 3
+
+  iters:
+    max_tokens: &max_tokens 7_695_097_856 # we set this to give us 2 epochs assuming 4096 max len
+    max_iters: &max_iters null
+    batch_size: &batch_size 16 # global bs needs to be 128
+
+  intervals:
+    ckpt_interval: &ckpt_interval 500 
+    log_interval: &log_interval 10
+    eval_interval: &eval_interval 500
+
+  dev_eval:
+    max_eval_iters: &max_eval_iters 500
+    dev_metrics: &dev_metrics
+      dev_accuracy:
+        id: accuracy
+        args:
+          name: dev_accuracy
+
+  data_loader:
+    num_workers: &num_workers 32 # TODO: can't quite remember why 1 but think it fixed a bug
+    loader_timeout: &loader_timeout 30 # TODO: can't quite remember why 1 but think it fixed a bug
+
+  trainer_id: &trainer_id hf_trainer
+
+  tokenizer: &tokenizer
+    id: hf_auto_tokenizer
+    args: 
+      pretrained_model_name_or_path: allenai/Llama-3.1-Tulu-3-8B-SFT
+
+  proccess_group:
+    init_process_group_at_start: &init_process_group_at_start True
+    shutdown_distributed_processes_at_end: &shutdown_distributed_processes_at_end True 
+
+##########################################
+#             Weights & Biases           #
+##########################################
+
+wandb:
+  project_name: sft 
+  run_name: 02-06-25-llama8b-3dot1-sft-v0dot4-lower-lr-1node #02-04-25-llama8b-3dot1-sft-v0dot3-og-lr-1node
+
+############################################
+#                 Models                   #
+############################################
+
+model:
+  id: hf
+  args: pretrained=meta-llama/Llama-3.1-8B,torch_dtype=bfloat16,attn_implementation=flash_attention_2
+  precision: bf16
+  do_compile: False
+  parallelism: fsdp_model
+  precision: bf16
+  n_extend_vocab: 1
+  pad_vocab_size_to_multiple_of: 8
+  max_len: &max_len 4096
+
+
+############################################
+#              Checkpointing               #
+############################################
+
+ckpt:
+  copy_ckpt_to_local: False
+  resume_ckpt: /output/02-06-25-llama8b-3dot1-sft-v0dot4-lower-lr-1node/checkpoints/13500  #/output/02-04-25-llama8b-3dot1-sft-v0dot3-og-lr-1node/checkpoints/14677
+  #load_optimizer: True
+  checkpointer: fsdp_checkpointer
+  strip_prefix: _orig_mod.
+  save_best_model_at_end_for_eval: True
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output
+  hf_username: jasonkrone
+  copy_dir: /copy
+  ckpt_interval: *ckpt_interval
+
+##########################################
+#                 Imports                #
+##########################################
+
+include: configs/train/baselines/_sft_template_yaml

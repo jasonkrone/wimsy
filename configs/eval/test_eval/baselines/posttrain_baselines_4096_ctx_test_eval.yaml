@@ -1,0 +1,48 @@
+wandb:
+  project_name: baseline_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+eval_vars:
+  do_apply_chat_template: &do_apply_chat_template True
+  ifeval_max_gen_toks: &ifeval_max_gen_toks 3840
+
+include: configs/eval/test_eval/_test_evals_yaml
+
+baselines:
+
+  # 2024-09-22:20:52:47,076 WARNING  [utils.py:554] /usr/local/lib/python3.10/client_configs/openai_configs.yaml wasn't found. We are using environment variables to construct the client configs.This is the old and non-recommended way of doing it. Please see `client_configs/README.md` for the recommended way of specifying client configs.
+  ########################################################################################
+  #                                Instruction Tuned Models                              #
+  ########################################################################################
+
+  ########## Llama-2 Instruct ##########
+  #llama-2-7b-tulu-v2-sft:
+  #  id: hf
+  #  args: pretrained=allenai/tulu-2-7b
+  #llama-2-7b-tulu-v2-instruct:
+  #  id: hf
+  #  args: pretrained=allenai/tulu-2-dpo-7b
+  llama-2-7b-chat:
+    id: hf
+    args: pretrained=meta-llama/Llama-2-7b-chat-hf
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  clear_cache: True
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baselines
+  tasks:
+    <<: *test_eval_tasks
+  

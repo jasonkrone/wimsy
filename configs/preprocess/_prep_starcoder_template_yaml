@@ -1,0 +1,255 @@
+template_vars:
+  num_processes: &num_processes 64
+  context_len: &context_len 4096
+
+  downloader:
+    download_destination: &download_destination /local_out/download-$dataset/documents
+
+  elastic_search_base_args: &es_args
+    index_name: &index_name $dataset
+    hosts:
+      - http://elasticsearch:9200
+    request_timeout: 600
+    max_retries: 10
+    pbar_interval: 100_000
+    num_processes: *num_processes
+
+  sampler:
+    sampler_destination: &sampler_destination /local_out/sampler-$dataset
+    sampler_metadata: &sampler_metadata /local_out/sampler-$dataset-metadata
+
+  elastic_search_indexer:
+    source_glob: &indexer_source_glob /local_out/download-$dataset/documents/*/*.$source_extension
+    chunk_size: &chunk_size_to_index 500 
+    property_to_jsonpath: &property_to_jsonpath
+      id: id
+      text: text
+      created: created
+      source: source
+
+  contaminated_span_tagger:
+    ckpt_interval: &ckpt_interval 1_000_000
+    micro_batch_size: &micro_batch_size 64 
+    do_find_contaminated_spans: &do_find_contaminated_spans False
+    # settings for decontamination
+    decontam_ngram_queries_path: &decontam_ngram_queries_path /sky_workdir/decontam-ngram-queries--ngram-size-13.jsonl.gz
+    decontam_ngram_sources_path: &decontam_ngram_sources_path /sky_workdir/ngram-source-locations--ngram-size-13.json.gz 
+    num_decontam_ngrams: &num_decontam_ngrams 26490831
+    # settings for analysis
+    analysis_ngram_queries_path: &analysis_ngram_queries_path /sky_workdir/decontam-ngram-queries--ngram-size-8.jsonl.gz
+    analysis_ngram_sources_path: &analysis_ngram_sources_path /sky_workdir/ngram-source-locations--ngram-size-8.json.gz
+    num_analysis_ngrams: &num_analysis_ngrams 26869120
+    analysis_metadata: &analysis_metadata /local_out/contam-analysis-$dataset-metadata
+
+  decontaminator:
+    decontam_metadata: &decontam_metadata /local_out/decontam-$dataset-metadata
+
+  map_jsonl:
+    map_source: &map_source /local_out/download-$dataset/documents/*/*.$source_extension
+    map_destination: &map_destination /local_out/map-$dataset
+    map_metadata: &map_metadata /local_out/map-$dataset-metadata
+
+  split_maker:
+    split_source: &split_source /local_out/map-$dataset/*/*.$source_extension
+    split_destination: &split_destination /local_out/split-$dataset
+
+  split_writer:
+    tokenizer: &tokenizer
+      id: tiktoken
+      args: {}
+    property_to_default: &property_to_default
+      source: $dataset
+    # at 4096 seq length this is ~2.4k samples per chunk
+    num_tokens_per_chunk: &num_tokens_per_chunk 10_000_000
+    mds_size_limit: &mds_size_limit 130mb
+    # train
+    train_source: &train_source /local_out/split-$dataset/*/train/*.$source_extension
+    train_destination: &train_destination s3://$dataset-mds-decontam-ctx-4096-tokenizer-tiktoken/train
+    # dev
+    dev_source: &dev_source /local_out/split-$dataset/*/dev/*.$source_extension
+    dev_destination: &dev_destination s3://$dataset-mds-decontam-ctx-4096-tokenizer-tiktoken/dev
+
+
+pipeline:
+  # download the data to decontaminate
+  #- id: downloader
+  #  args:
+  #    urls_path: *urls_path
+  #    destination_prefix: *download_destination
+  #    num_shards: *num_shards
+  #    num_processes: *num_processes
+  #    cleanup: *do_cleanup
+  #    is_distributed: *is_distributed
+  #    src_location: *source_location
+  #  call_kwargs: {}
+
+  ## subsample 
+  #- id: sampler
+  #  args:
+  #    source_prefix: *indexer_source_glob
+  #    destination_prefix: *sampler_destination
+  #    metadata_prefix: *sampler_metadata
+  #    suffix_depth: 2
+  #    num_processes: *num_processes
+  #  call_kwargs:
+  #    jsonpath: *sampler_jsonpath
+  #    source_regex_to_value_to_samples: *source_regex_to_value_to_samples
+  #    is_dryrun: False
+  
+  ## index the data to decontaminate
+  #- id: elastic_search_indexer
+  #  args:
+  #    <<: *es_args
+  #    num_documents_to_index: *num_documents_to_index
+  #    source_glob: *indexer_source_glob
+  #    chunk_size: *chunk_size_to_index
+  #    metadata_prefix: *decontam_metadata
+  #    property_to_jsonpath:
+  #      <<: *property_to_jsonpath
+  #    properties:
+  #      created:
+  #        type: date
+  #        format: strict_date_optional_time||epoch_millis
+  #      id:
+  #        type: text
+  #        analyzer: standard
+  #      text:
+  #        type: text
+  #        analyzer: standard
+  #      path:
+  #        type: text
+  #        analyzer: standard
+  #      line_num:
+  #        type: integer
+
+  #- id: contaminated_span_tagger 
+  #  args:
+  #    <<: *es_args
+  #    num_ngrams: *num_decontam_ngrams
+  #    micro_batch_size: *micro_batch_size
+  #    ngram_queries_path: *decontam_ngram_queries_path
+  #    ngram_sources_path: *decontam_ngram_sources_path
+  #    metadata_prefix: *decontam_metadata
+  #    do_find_contaminated_spans: *do_find_contaminated_spans
+  #    round_to_delimiter: null
+  #    search_after_field: created
+  #    ckpt_interval: *ckpt_interval 
+
+  #- id: decontaminator
+  #  args:
+  #    drop_entire_doc: *drop_entire_doc
+  #    drop_doc_contamination_threshold: *drop_doc_contamination_threshold
+  #    metadata_prefix: *decontam_metadata
+  #    replacement_text: "" 
+  #    is_dryrun: False # creates temp files but doesn't move them
+  #    property_to_jsonpath:
+  #      <<: *property_to_jsonpath
+  #    num_processes: *num_processes 
+
+  #- id: map_jsonl
+  #  args:
+  #    source_prefix: *map_source
+  #    destination_prefix: *map_destination
+  #    metadata_prefix: *map_metadata
+  #    suffix_depth: 2
+  #    num_processes: *num_processes
+  #    json_transforms:
+  #      - id: remove_json_keys
+  #        args:
+  #          keys_to_remove: *keys_to_remove
+  #  call_kwargs:
+  #    cleanup: *do_cleanup
+
+  #- id: split_maker
+  #  args:
+  #    source_prefix: *split_source
+  #    destination_prefix: *split_destination
+  #    metadata_prefix: *map_metadata
+  #    suffix_depth: 2
+  #    num_processes: *num_processes
+  #  call_kwargs:
+  #    context_len: *context_len
+  #    avg_num_tokens_per_doc: *avg_num_tokens_per_doc
+  #    split_to_num_examples:
+  #      dev: *dev_size
+  #      train: null
+  #    cleanup: *do_cleanup
+
+  ## write train data
+  #- id: mds_writer 
+  #  args:
+  #    source_prefix: *train_source
+  #    destination_prefix: *train_destination
+  #    shard_from_source_regex: (shard-\d+-of-\d+)
+  #    context_len: *context_len
+  #    tokenizer:
+  #      <<: *tokenizer
+  #    property_to_jsonpath:
+  #      <<: *property_to_jsonpath
+  #    property_to_default:
+  #      <<: *property_to_default
+  #    hf_cache_dir: /local_out/.cache/huggingface/dataprep
+  #    num_processes: *num_processes # num cpu cores // 2
+  #    compression: zstd
+  #    num_tokens_per_chunk: *num_tokens_per_chunk
+  #    mds_size_limit: *mds_size_limit
+  #    is_distributed: *is_distributed
+  #  call_kwargs:
+  #    cleanup: *do_cleanup
+
+  ### write dev data
+  #- id: mds_writer 
+  #  args:
+  #    source_prefix: *dev_source
+  #    destination_prefix: *dev_destination
+  #    shard_from_source_regex: (shard-\d+-of-\d+)
+  #    context_len: *context_len
+  #    tokenizer:
+  #      <<: *tokenizer
+  #    property_to_jsonpath:
+  #      <<: *property_to_jsonpath
+  #    property_to_default:
+  #      <<: *property_to_default
+  #    hf_cache_dir: /local_out/.cache/huggingface/dataprep
+  #    num_processes: *num_processes
+  #    compression: zstd
+  #    num_tokens_per_chunk: *num_tokens_per_chunk
+  #    mds_size_limit: *mds_size_limit
+  #    is_distributed: *is_distributed
+  #  call_kwargs:
+  #    cleanup: *do_cleanup
+
+
+  # get the 8gram spans for contamination analysis
+  - id: contaminated_span_tagger 
+    args:
+      <<: *es_args
+      num_ngrams: *num_analysis_ngrams
+      micro_batch_size: *micro_batch_size
+      ngram_queries_path: *analysis_ngram_queries_path
+      ngram_sources_path: *analysis_ngram_sources_path
+      metadata_prefix: *analysis_metadata
+      do_find_contaminated_spans: *do_find_contaminated_spans
+      round_to_delimiter: null
+      search_after_field: created
+      ckpt_interval: *ckpt_interval 
+      ckpt_path: *analysis_ckpt_path
+
+  - id: artifact_uploader
+    args:
+      s3_destination: s3://$dataset-mds-decontam-ctx-4096-tokenizer-tiktoken/metadata
+      dirs_to_upload:
+        - *map_metadata
+        - *decontam_metadata
+        - *analysis_metadata
+
+  ## save a snapshot of elastic search index 
+  #- id: elastic_search_snapshotter
+  #  args:
+  #    <<: *es_args
+  #    repository_name: jpt-elastic 
+  #    repository_settings:
+  #      type: s3
+  #      settings:
+  #        bucket: jpt-elastic
+  #        region: us-east-1

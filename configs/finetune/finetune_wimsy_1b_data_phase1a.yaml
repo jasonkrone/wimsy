@@ -1,0 +1,54 @@
+##########################################
+#            Run specific params          #
+##########################################
+
+hyper_params:
+  learning_rate: &learning_rate 0.00147477
+
+  trainer_id: &trainer_id trainer
+
+  tokenizer: &tokenizer
+    id: tiktoken
+    args: {}
+
+  proccess_group:
+    init_process_group_at_start: &init_process_group_at_start True
+    shutdown_distributed_processes_at_end: &shutdown_distributed_processes_at_end True
+
+##########################################
+#                 Imports                #
+##########################################
+
+include: configs/train/wimsy/wimsy_1b/architectures/_llama_1b_architecture_yaml
+include: configs/finetune/_shared_finetune_hyper_params_yaml
+include: configs/finetune/_finetune_template_yaml
+
+##########################################
+#             Weights & Biases           #
+##########################################
+
+wandb:
+  project_name: finetune_for_hpo
+  run_name: finetune-wimsy1b-data-phase1a-try5-hpo-lr
+
+############################################
+#              Checkpointing               #
+############################################
+
+
+
+ckpt:
+  strict: False
+  load_dataset_loader: False
+  save_best_model_at_end_for_eval: True
+  load_optimizer: False
+  resume_from_iter: null
+  resume_ckpt: /output/wimsy-llama-1b-model-phase1a-data-phase-1-hyperparams/checkpoints/87193_new_ckpt_format
+  checkpointer: fsdp_checkpointer
+  strip_prefix: _orig_mod.
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output
+  copy_dir: /copy
+  ckpt_interval: *ckpt_interval
+
+

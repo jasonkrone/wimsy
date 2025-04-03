@@ -1,0 +1,76 @@
+name: train-dist-7b
+
+resources:
+  accelerators: {H100:8}
+  cloud: lambda
+  region: us-south-2
+
+num_nodes: 1
+
+file_mounts:
+  /output:
+    source: s3://jpt-output
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+  #remote_sqsh_path="s3://jpt-apps/jpt.sqsh"
+  #remote_sqsh_path="s3://jpt-apps/jpt_flash_atnn.sqsh"
+  #remote_sqsh_path="s3://jpt-apps/eval.sqsh"
+  remote_sqsh_path="s3://jpt-apps/shortuuid.sqsh"
+  
+  local_sqsh_path="/tmp/eval.sqsh"
+  env_name=train_env
+  
+  # install enroot
+  source ./bash/setup.sh; install_enroot
+  
+  # copy the sqsh file
+  echo "copying sqsh file"
+  aws s3 cp $remote_sqsh_path $local_sqsh_path
+  
+  # create the enroot env 
+  echo "creating enroot env"
+  enroot create --name $env_name $local_sqsh_path
+
+  # download books
+  # we download b/c we're using streaming on local data
+  echo "downloading books"
+  mkdir /home/ubuntu/data
+  dataset=books-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+  source /home/ubuntu/sky_workdir/keys.env ; aws s3 sync s3://${dataset} /home/ubuntu/data/${dataset}
+  
+
+run: |
+  # expected to exec with --env CONFIG=./configs/train/llm_exps/exp_0_baseline_tweaks/baseline.yaml
+  
+  kill $(lsof -ti :1234 | head -n 1)
+  
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  
+  # TODO: could make sense to use env to set the config! 
+  #config_path=/sky_workdir/configs/train/7b_fsdp/train_7b_streaming.yaml
+  #config_path=/sky_workdir/configs/train/llm_exps/exp_0_baseline_tweaks/baseline.yaml
+  
+  root_dir=/sky_workdir
+  config_path=${root_dir}/${CONFIG}
+  echo "config path: ${config_path}"
+  
+  source ./bash/setup.sh ; clean_tmp
+  
+  env_name=train_env
+  
+  enroot start \
+    --rw \
+    --mount /home/ubuntu/sky_workdir:/sky_workdir \
+    --mount /home/ubuntu/data:/data \
+    --mount /tmp:/tmp \
+    --mount /output:/output \
+    --env SKYPILOT_NUM_NODES=$num_nodes \
+    --env SKYPILOT_NODE_IPS \
+    --env SKYPILOT_NUM_GPUS_PER_NODE \
+    --env SKYPILOT_NODE_RANK \
+    --env TRANSFORMERS_CACHE=/tmp/.cache \
+    $env_name \
+    /sky_workdir/run.sh run_main $config_path

@@ -1,0 +1,53 @@
+shared_hyper_params:
+
+  general:
+    seed: &seed 414
+    gpu_type: &gpu_type H100_SXM_bf16 
+
+  optimizer:
+    learning_rate: *learning_rate #0.00002 # TODO: idk how we got this LR let's also try 0.0003
+    beta_1: &beta_1 0.9
+    beta_2: &beta_2 0.95
+    epsilon: &epsilon 0.00000001
+
+  lr_schedule: &lr_schedule
+    id: cosine_with_linear_warmup_lr_schedule
+    args:
+      warmup_iters: 500 # TODO: might need to go up when we change the data
+      lr_max: *learning_rate
+      cos_lr_min: null # now setting to 10% of max (was 0.000002)
+      warmup_lr_min: 0.0
+      max_iters: 1.0 # 100% of max iters so that max_iters
+      max_iter_units: percentage # max_iters will be set as a percentage of config.iters.max_iters
+
+  loss:
+    max_grad_norm: &max_grad_norm 1.0
+    loss_fn: &loss_fn
+      id: cross_entropy
+      args: {}
+
+  regularization:
+    weight_decay: &weight_decay 0.033
+    early_stopping_patience: &early_stopping_patience 3
+
+  iters:
+    max_tokens: &max_tokens null
+    max_iters: &max_iters 5000  # TODO: this might need to go up when we change the data
+    batch_size: &batch_size 12 #7 # was set to 4 but that was for a 40GB GPU
+
+  intervals:
+    ckpt_interval: &ckpt_interval 500 
+    log_interval: &log_interval 10
+    eval_interval: &eval_interval 500
+
+  dev_eval:
+    max_eval_iters: &max_eval_iters 500
+    dev_metrics: &dev_metrics
+      dev_accuracy:
+        id: accuracy
+        args:
+          name: dev_accuracy
+
+  data_loader:
+    num_workers: &num_workers 1 # TODO: can't quite remember why 1 but think it fixed a bug
+    loader_timeout: &loader_timeout 30 # TODO: can't quite remember why 1 but think it fixed a bug

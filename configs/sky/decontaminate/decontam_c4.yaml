@@ -1,0 +1,56 @@
+name: prep-c4-dist
+
+resources:
+  cloud: aws
+  instance_type: i3.16xlarge
+  disk_size: 900
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+num_nodes: 5
+
+workdir: ~/Developer/jpt
+
+setup: |
+  # download the artifact
+  source ~/sky_workdir/keys.env; aws s3 cp s3://jpt-artifacts/test_and_dev_13_grams.jsonl.gz /home/ubuntu/test_and_dev_13_grams.jsonl.gz
+
+  # setup elastic serach
+  sudo mkdir /es
+  sudo chown -R 1000:0 /es
+  sudo docker run -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" -v /es:/usr/share/elasticsearch/data docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+
+run: |
+  cd ~/sky_workdir
+
+  # install conda
+  requirements_path="requirements/requirements.txt"
+  env_name="prep_data2"
+  source ./bash/setup.sh; activate_or_create_conda_env $env_name $requirements_path
+  #pip install -r $requirements_path 
+  
+  #config_path=./configs/decontaminate/c4_decontaminate.yaml
+  #source keys.env; python -m preprocessing.prep_data --config $config_path
+  #source keys.env; python -m preprocessing.recover_ids_and_line_nums --config $config_path
+
+
+  # Correct tilde expansion by removing quotes or using $HOME
+  root_dir=~/data/download-c4/documents/
+
+  ## Ensure root_dir is expanded correctly
+  root_dir=$(realpath -m "$root_dir")
+
+  ## Find the first subdirectory in root_dir
+  shard_name=$(find "$root_dir" -maxdepth 1 -type d ! -path "$root_dir" -printf '%f\n' | head -n1)
+
+  ## Correct variable reference using ${root_dir}
+  artifacts_dir="${root_dir}/${shard_name}-decontam-artifacts"
+  mkdir -p "$artifacts_dir"
+
+  ## Copy all files from root_dir to artifacts_dir
+  find "$root_dir" -maxdepth 1 -type f -exec cp "{}" "$artifacts_dir/" \;
+
+  # Sync artifacts_dir to S3, specifying the correct S3 path
+  source ~/sky_workdir/keys.env; aws s3 rm "s3://jpt-output/${shard_name}-decontam-artifacts" --recursive
+  source ~/sky_workdir/keys.env; aws s3 sync "$artifacts_dir" "s3://jpt-output/c4-${shard_name}-decontam-artifacts"
+

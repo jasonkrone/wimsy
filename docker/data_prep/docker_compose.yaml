@@ -1,0 +1,30 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - /es:/usr/share/elasticsearch/data
+
+  jpt_prep_data:
+    image: jpolingkrone/jpt_prep_data:latest # jpolingkrone/jpt:jupyter  
+    volumes:
+      - /es:/es
+      - /local_out:/local_out
+      - ~/sky_workdir:/sky_workdir
+      - /output:/output
+    tty: true
+    stdin_open: true
+    command: bash
+    ports:
+      - 9999:9999
+    depends_on:
+      - elasticsearch
+    environment:
+      - SKYPILOT_NODE_RANK
+      - SKYPILOT_NODE_IPS

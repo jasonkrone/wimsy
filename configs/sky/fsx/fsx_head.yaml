@@ -1,0 +1,26 @@
+name: fsx-head-node
+
+resources:
+  instance_type: m5.8xlarge
+  cloud: aws
+  region: us-east-1
+
+file_mounts:
+  /output:
+    source: s3://wimsy
+    mode: MOUNT
+
+# these need to be set in ~/.sky/config.yaml
+#security_group_name: my-head-security-group
+#vpc_name: vpc-0d848de6b1c387a84
+
+num_nodes: 1
+
+workdir: ~/Developer/jpt
+
+setup: |
+  echo "setup"
+
+run: |
+  echo "running"
+

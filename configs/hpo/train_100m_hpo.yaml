@@ -1,0 +1,123 @@
+##########################################
+#             Weights & Biases           #
+##########################################
+wandb:
+  project_name: mini_jpt_hpo_temp_test
+  run_name: hpo_temp_test_02_19_24
+
+##########################################
+#                 Compute                #
+##########################################
+compute:
+  device: cuda
+  gpu_type: V100_fp32
+  backend: nccl
+  is_distributed: True
+
+##########################################
+#                   HPO                  #
+##########################################
+hpo:
+  is_hpo_run: True
+  num_hpo_trials: 16
+
+##########################################
+#         Optimizer & Training           #
+##########################################
+# set based on the phi-1.5 hyper params / SophiaG's github repo
+optimizer:
+  learning_rate: null #0.0006 # taken from SophiaG optimizer github repo
+  beta_1: 0.9
+  beta_2: 0.98
+  epsilon: 0.00000001
+
+iters:
+  batch_size: &batch_size 2 #28 # (28 = training bs 80gb, 12 = training bs 40gb, 16 = evaluation bs 80gb)
+  max_tokens: null # 10B
+  max_iters: 5 # TODO: you would never actually use this setting
+  learning_rate_schedule_max_iters: 300000 # TODO: I think this is irrelevant
+  warmup_iters: 1000 # 0.33% (based on llama2 setting)
+
+regularization:
+  weight_decay: 0.1
+  early_stopping_patience: 3
+
+loss:
+  max_grad_norm: 1.0
+#########################################
+#                 Model                 #
+#########################################
+seed: &seed 414
+# according to MPT-7B NeoX vocab is actually 50257 but that contradicts huggingface
+model:
+  precision: fp32
+  vocab_size: 50432 # TODO: code might run faster w/ this set to 51,200 i.e. a multiple of 512
+  n_layers: 12
+  d_model: 768
+  n_heads: 12
+  attn: attn # flash_attn # switched b/c we're running on V100s which don't have bf16
+  mlp: mlp_swiglu
+  pos_encoding: null
+  qk_encoding: rotary_encoding
+  d_hidden: 2048
+  max_len: &context_len 2048
+  p_dropout: 0.1
+  init_stdev: 0.02
+
+ckpt:
+  output_dir: /output
+  ckpt_interval: 2 # 5000
+###########################################
+#                  Eval                   #
+###########################################
+
+eval:
+  batch_size: 4
+  log_interval: 2 # 500
+  eval_interval: 2 # 5000
+  max_eval_iters: 2 #200
+  # args below here are for LM harness evaluation
+  tasks:
+    - lambada_openai # GPT-2 117M: 35.13 PPL, 45.99 ACC
+    - wikitext # GPT-2 117M: 29.41 PPL
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  ckpt_path: null # when none, loads latest ckpt from ckpt dir
+
+###########################################
+#                  Data                   #
+###########################################
+
+data:
+  tokenizer_name: EleutherAI/gpt-neox-20b
+
+  data_loader:
+    id: streaming_data_loader
+    args:
+      pin_memory: True
+      batch_size: *batch_size
+
+  train_dataset:
+    id: streaming_text_dataset
+    args:
+      streams:
+        - remote: s3://jpt-data/dolma/tokenized/books-mds/train
+          proportion: 1.0
+          local: /tmp/books_train
+      keep_zip: False
+      batch_size: *batch_size
+      shuffle_seed: *seed
+      predownload: 32 # TODO: this is temp!!!
+
+  dev_dataset:
+    id: streaming_text_dataset
+    args:
+      streams:
+        - remote: s3://jpt-data/dolma/tokenized/books-mds/dev
+          proportion: 1.0
+          local: /tmp/books_dev
+      keep_zip: False
+      batch_size: *batch_size
+      shuffle_seed: *seed
+      predownload: 32 # TODO: this is temp!!!

@@ -1,0 +1,26 @@
+task: winogrande_hpo
+dataset_path: jasonkrone/winogrande_with_dev_hpo
+dataset_name: null
+output_type: multiple_choice
+training_split: train
+validation_split: dev_hpo
+target_delimiter: " "
+doc_to_text: "Question: Which sentence is more likely?\nA. {{ choices[0] }}\nB. {{ choices[1] }}\nAnswer:"
+doc_to_target: "{% if answer == 'A' %}{{choices[0]}}{% else %}{{choices[1]}}{% endif %}"
+doc_to_choice: "{{choices}}" #["A", "B"]
+should_decontaminate: true
+doc_to_decontamination_query: "{{ choices[0] }}\n{{ choices[1] }}"
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_norm
+    aggregation: mean
+    higher_is_better: true
+  - metric: nll_per_char
+    aggregation: mean
+    higher_is_better: false
+metadata:
+  version: 1.0
+dataset_kwargs:
+  trust_remote_code: true

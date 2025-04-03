@@ -1,0 +1,61 @@
+name: hpo_100m_jpt_v100_cluster
+
+resources:
+  accelerators: V100:4
+  cloud: aws
+  region: us-east-2
+  image_id: ami-063428ce3e73b179b
+
+num_nodes: 2
+
+workdir: ~/Developer/jpt
+
+file_mounts:
+  /output:
+    name: jpt-output
+    mode: MOUNT
+
+setup: | 
+  # wait for conda to get setup
+  sleep 30
+  
+  # deactivate env just in case one is active
+  conda deactivate
+  
+  # create hpo env if it doesn't exist
+  env_name=hpo
+  conda activate "$env_name"
+  if [ $? -eq 0 ]; then
+    echo "conda env exists"
+  else
+    # Strange bug that we fix for us-east-2
+    conda config --remove channels https://aws-ml-conda-ec2.s3.us-west-2.amazonaws.com
+    # Setup the environment
+    conda create -n "$env_name" python=3.9.18 -y
+    conda activate "$env_name"
+    pip install -r requirements/requirements.txt
+  fi
+   
+  # don't think we need this 
+  #echo "setup"
+  #cat keys.env >> ~/.bashrc
+  #source ~/.bashrc
+
+run: |
+  env_name=hpo
+  ray_port=6379
+
+  num_nodes=$(echo "$SKYPILOT_NODE_IPS" | wc -l)
+  head_ip=$(echo "$SKYPILOT_NODE_IPS" | head -n1)
+  
+  conda deactivate
+  conda activate "$env_name"
+  
+  if [ "$SKYPILOT_NODE_RANK" == "0" ]; then
+    ps aux | grep ray | grep 6379 &> /dev/null || ray start --head  --disable-usage-stats --port "$ray_port" --ray-client-server-port 9999
+    sleep 30
+    source keys.env; python -m hpo.hpo --config ./configs/hpo/train_100m_hpo.yaml
+  else
+    sleep 15
+    ps aux | grep ray | grep 6379 &> /dev/null || ray start --address $head_ip:"$ray_port" --disable-usage-stats
+  fi

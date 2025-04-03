@@ -1,0 +1,28 @@
+
+template_vars:
+  do_cleanup: &do_cleanup False
+
+  num_processes: &num_processes 64
+  context_len: &context_len 4096
+
+  document_filter:
+    filter_source: &filter_source ./tests/artifacts/score_filter/inputs/*/*.jsonl.gz
+    filter_destination: &filter_destination ./tests/artifacts/score_filter/outputs
+    filter_metadata: &filter_metadata ./tests/artifacts/score_filter/outputs
+    exclude_logic: &exclude_logic
+      - ".fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob < 0.3222048282623291"
+
+pipeline:
+  # TODO: should this have num processes
+  # remove unwanted tasks from the dataset
+  - id: safe_filter
+    args:
+      source_prefix: *filter_source
+      destination_prefix: *filter_destination
+      metadata_prefix: *filter_metadata
+      suffix_depth: 2
+      num_processes: *num_processes
+    call_kwargs:
+      cleanup: *do_cleanup
+      exclude: 
+        - "$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob < 0.3222048282623291)]"

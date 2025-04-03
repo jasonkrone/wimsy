@@ -1,0 +1,35 @@
+name: prep-reddit
+
+resources:
+  cloud: aws
+  instance_type: i3.16xlarge
+  disk_size: 800
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+num_nodes: 2
+
+workdir: ~/Developer/jpt
+
+setup: |
+  # download the artifact
+  source ~/sky_workdir/keys.env; aws s3 cp s3://jpt-artifacts/test_and_dev_13_grams.jsonl.gz /home/ubuntu/test_and_dev_13_grams.jsonl.gz
+
+  # setup elastic serach
+  sudo mkdir /es
+  sudo chown -R 1000:0 /es
+  sudo docker run -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" -v /es:/usr/share/elasticsearch/data docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+
+run: |
+  cd ~/sky_workdir
+
+  # install conda
+  requirements_path="requirements/requirements.txt"
+  env_name="prep_data2"
+  source ./bash/setup.sh; activate_or_create_conda_env $env_name $requirements_path
+  #pip install -r $requirements_path 
+  
+  config_path=./configs/decontaminate/reddit_decontaminate.yaml
+  #source keys.env; python -m preprocessing.prep_data --config $config_path
+
+  source keys.env; python -m preprocessing.recover_ids_and_line_nums --config $config_path --get_indexed_doc_ids

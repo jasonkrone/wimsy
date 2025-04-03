@@ -1,0 +1,96 @@
+substitutions:
+  dataset: dclm-top500b
+  source_extension: jsonl.zstd
+
+vars:
+  cleanup: &do_cleanup True 
+  is_distributed: &is_distributed True
+  num_processes: &num_processes 64
+ 
+  downloader:
+    download_destination: &download_destination /local_out/download-$dataset/documents
+    urls_path: &urls_path ./preprocessing/dataset_urls/dclm_baseline/dclm_baseline.txt
+    num_shards: &num_shards 12
+    source_location: &source_location s3
+
+  grouper:
+    grouper_source: &grouper_source /local_out/download-$dataset/documents/*/*.$source_extension
+    grouper_destination: &grouper_destination /local_out/group-$dataset 
+    grouper_metadata: &grouper_metadata /local_out/group-$dataset-metadata
+
+  merger:
+    merger_max_docs_per_file: &merger_max_docs_per_file 100000
+    merger_metadata: &merger_metadata /local_out/resize-files-$dataset-metadata
+
+
+pipeline:
+
+  #- id: downloader
+  #  args:
+  #    urls_path: *urls_path
+  #    destination_prefix: *download_destination
+  #    num_shards: *num_shards
+  #    num_processes: 32 # *num_processes
+  #    cleanup: *do_cleanup
+  #    is_distributed: *is_distributed
+  #    src_location: *source_location
+  #  call_kwargs: {}
+
+  #- id: grouper
+  #  args:
+  #    source_prefix: *grouper_source
+  #    destination_prefix: *grouper_destination
+  #    metadata_prefix: *grouper_metadata
+  #    suffix_depth: 2
+  #    num_processes: *num_processes
+  #  call_kwargs:
+  #    cleanup: *do_cleanup
+  #    group_to_jsonpath:
+  #      gre-0.32-leq-0.36: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.3222048282623291 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.3598443269729614)]"
+  #      gre-0.36-leq-0.40: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.3598443269729614 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.40439730882644653)]"
+  #      gre-0.40-leq-0.46: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.40439730882644653 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.45728957653045654)]"
+  #      gre-0.46-leq-0.52: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.45728957653045654 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.5182561278343201)]"
+  #      gre-0.52-leq-0.59: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.5182561278343201 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.592847466468811)]"
+  #      gre-0.59-leq-0.68: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.592847466468811 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.6803178787231445)]"
+  #      gre-0.68-leq-0.78: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.6803178787231445 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.7796028852462769)]"
+  #      gre-0.78-leq-0.88: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.7796028852462769 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.8828468322753906)]"
+  #      gre-0.88-leq-0.97: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.8828468322753906 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 0.9686537981033325)]"
+  #      gre-0.97-leq-1.00: "$$[?(@.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob > 0.9686537981033325 & @.fasttext_openhermes_reddit_eli5_vs_rw_v2_bigram_200k_train_prob <= 1.0000100135803223)]"
+
+  #- id: merger
+  #  args:
+  #    num_processes: *num_processes
+  #    max_docs_per_file: *merger_max_docs_per_file
+  #    metadata_prefix: *merger_metadata
+  #    buffer_size: 10_000
+  #    add_rank_to_filename: True
+  #  call_kwargs:
+  #    cleanup: True
+  #    sources_and_destinations:
+  #      - destination: /local_out/resize-files-$dataset/gre-0.32-leq-0.36
+  #        source_prefix: /local_out/group-$dataset/*gre-0.32-leq-0.36/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.36-leq-0.40
+  #        source_prefix: /local_out/group-$dataset/*gre-0.36-leq-0.40/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.40-leq-0.46
+  #        source_prefix: /local_out/group-$dataset/*gre-0.40-leq-0.46/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.46-leq-0.52
+  #        source_prefix: /local_out/group-$dataset/*gre-0.46-leq-0.52/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.52-leq-0.59
+  #        source_prefix: /local_out/group-$dataset/*gre-0.52-leq-0.59/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.59-leq-0.68
+  #        source_prefix: /local_out/group-$dataset/*gre-0.59-leq-0.68/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.68-leq-0.78
+  #        source_prefix: /local_out/group-$dataset/*gre-0.68-leq-0.78/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.78-leq-0.88
+  #        source_prefix: /local_out/group-$dataset/*gre-0.78-leq-0.88/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.88-leq-0.97
+  #        source_prefix: /local_out/group-$dataset/*gre-0.88-leq-0.97/*.$source_extension
+  #      - destination: /local_out/resize-files-$dataset/gre-0.97-leq-1.00
+  #        source_prefix: /local_out/group-$dataset/*gre-0.97-leq-1.00/*.$source_extension
+
+  #- id: artifact_uploader
+  #  args:
+  #    s3_destination: s3://$dataset-mds-decontam-ctx-4096-tokenizer-tiktoken/metadata
+  #    dirs_to_upload:
+  #      - /local_out/resize-files-$dataset
+

@@ -1,0 +1,95 @@
+seed: *seed 
+
+##########################################
+#                 Compute                #
+##########################################
+
+compute:
+  device: cuda
+  gpu_type: *gpu_type 
+  backend: nccl
+  is_distributed: True
+  init_process_group_at_start: *init_process_group_at_start
+  shutdown_distributed_processes_at_end: *shutdown_distributed_processes_at_end
+
+##########################################
+#         Optimizer & Training           #
+##########################################
+
+trainer:
+  id: *trainer_id
+
+regularization:
+  weight_decay: *weight_decay
+  early_stopping_patience: *early_stopping_patience
+
+loss:
+  max_grad_norm: *max_grad_norm
+  grad_accum_steps: *grad_accum_steps
+  per_grad_accum_step_loss_coef: *per_grad_accum_step_loss_coef
+  loss_fn:
+    <<: *loss_fn
+
+optimizer:
+  learning_rate: *learning_rate 
+  beta_1: *beta_1
+  beta_2: *beta_2
+  epsilon: *epsilon 
+
+lr_schedule:
+  <<: *lr_schedule
+
+iters:
+  batch_size: *batch_size
+  max_tokens: *max_tokens 
+  max_iters: *max_iters
+
+
+###########################################
+#                  Eval                   #
+###########################################
+
+dev_eval:
+  log_interval: *log_interval
+  eval_interval: *eval_interval
+  max_eval_iters: *max_eval_iters
+  reset_mfu: True
+  dev_metrics:
+    <<: *dev_metrics
+
+###########################################
+#                  Data                   #
+###########################################
+
+data:
+  sampler:
+    id: distributed_sampler
+    args:
+      drop_last: True
+      shuffle: True
+      seed: *seed
+
+  data_loader:
+    id: data_loader
+    args:
+      drop_last: True
+      batch_size: *batch_size
+      num_workers: *num_workers
+      timeout: *loader_timeout
+      collator:
+        id: seq2seq_collator
+        args:
+          padding: longest
+          tokenizer:
+            <<: *tokenizer
+
+  train_dataset:
+    id: sft_dataset
+    args:
+      dataset_path: allenai/tulu-3-sft-mixture
+      split: train
+      tokenizer:
+        <<: *tokenizer
+      max_length: *max_len
+      num_workers: *num_workers
+

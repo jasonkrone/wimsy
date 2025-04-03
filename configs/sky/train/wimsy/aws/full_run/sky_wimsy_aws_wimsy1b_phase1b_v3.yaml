@@ -1,0 +1,70 @@
+name: wimsy1b-phase-1b-worker-2-node-h100
+
+resources:
+  instance_type: p5.48xlarge
+  cloud: aws
+  region: us-east-1
+  zone: us-east-1f
+  image_id: ami-0772e0bfc7cc9c5de # OSS nvidia driver pytorch 2.5 (Ubuntu 22.04)
+
+num_nodes: 2
+
+file_mounts:
+  /output:
+    source: s3://wimsy
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+  remote_sqsh_path="s3://jpt-apps/pt2dot6_11_30_24.sqsh"
+  
+  local_sqsh_path="/tmp/train.sqsh"
+  env_name=train_env
+
+  # updates fix some enroot issues on GCP
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt update && sudo apt upgrade -y
+  
+  # install enroot
+  source ./bash/setup.sh; install_enroot
+  
+  # copy the sqsh file
+  echo "copying sqsh file"
+  aws s3 cp $remote_sqsh_path $local_sqsh_path
+  
+  # create the enroot env 
+  echo "creating enroot env"
+  enroot create --name $env_name $local_sqsh_path
+
+  # mount fsx
+  source ./bash/setup_fsx.sh ; mount_fsx
+ 
+
+run: |
+
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  
+  env_name=train_env
+  
+  fsx_mountpoint=/mnt/fsx
+
+  config=./configs/train/wimsy/wimsy_1b/pretrain_wimsy_1b_phase1b_v3.yaml
+
+  rm -rf ~/sky_workdir/training/__pycache__
+  rm -rf ~/sky_workdir/model/__pycache__
+
+  enroot start \
+    --rw \
+    --mount ~/sky_workdir:/sky_workdir \
+    --mount $fsx_mountpoint:/data \
+    --mount /tmp:/tmp \
+    --mount /output:/output \
+    --env SKYPILOT_NUM_NODES=$num_nodes \
+    --env SKYPILOT_NODE_IPS \
+    --env SKYPILOT_NUM_GPUS_PER_NODE \
+    --env SKYPILOT_NODE_RANK \
+    --env TRANSFORMERS_CACHE=/tmp/.cache \
+    $env_name \
+    /sky_workdir/bash/run_training.sh train $config
+

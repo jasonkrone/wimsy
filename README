@@ -1,0 +1,13 @@
+
+My setup is entirely config defined.
+
+I use skypilot (CLI util) to launch my clusters and run my jobs. You'll find skypilot configs for all my job types under ./configs/sky
+
+The skypilot configs specify the hardware to use, how to setup dependencies, and what command to run on the cluster.
+
+The training, preparation, eval jobs I run on the cluster are also config defined i.e. all the hyper-parameters, architecture, etc. are specified in yaml configs as well. The job configs are also located under ./configs. For example, ./configs/train/wimsy/wimsy_1b contains the pre-training configs for experiments on my 1B models.
+
+I use Docker + enroot for dependency management. You'll find my dockerfiles for training and data prep under ./docker/train_and_eval/Dockerfile and ./docker/data_prep/Dockerfile respectively.
+
+My evaluation code wraps the lm-evaluation-harness repo from EleutherAI. I've created my own fork which adds some tasks and fixes a few bugs: https://github.com/jasonkrone/lm-evaluation-harness/tree/main-jpt. To use my evaluation code, you need to clone my fork of lm-evaluation-harness at the root of this repo.
+

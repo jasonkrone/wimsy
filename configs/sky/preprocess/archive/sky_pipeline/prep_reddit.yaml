@@ -1,0 +1,61 @@
+name: download-and-prep-reddit
+
+---
+
+name: download-reddit
+
+resources:
+  cloud: aws
+  instance_type: i3.8xlarge
+  disk_size: 600
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+setup: |
+    pip install -r requirements/requirements.txt
+
+workdir: ~/Developer/jpt
+
+run: |
+  cd ~/sky_workdir
+  
+  dataset="reddit"
+  output_dir="./dolma/${dataset}"
+  urls_path="./preprocessing/dolma_urls/v1_6/${dataset}.txt"
+  bucket_prefix="${dataset}-chunk"
+  config_path="./configs/preprocessing/prep_dolma.yaml"
+  
+  source keys.env; python -m preprocessing.download_data \
+    --config $config_path \
+    --output_dir=$output_dir \
+    --urls_path=$urls_path \
+    --bucket_prefix=$bucket_prefix
+
+---
+
+name: preprocess-reddit
+
+resources:
+  cloud: aws
+  instance_type: i3.8xlarge
+  disk_size: 600
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+setup: |
+    pip install -r requirements/requirements.txt
+
+workdir: ~/Developer/jpt
+
+run: |
+  cd ~/sky_workdir
+  
+  dataset="reddit"
+  dataset_name_or_dir="s3://${dataset}-chunk-*"
+  output_dir="s3://jpt-data/dolma/tokenized/${dataset}"
+  config_path="./configs/preprocessing/prep_dolma.yaml"
+    
+  source keys.env; python -m preprocessing.prep_data \
+    --config $config_path \
+    --dataset_name_or_dir $dataset_name_or_dir \
+    --output_dir $output_dir

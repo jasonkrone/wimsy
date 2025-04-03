@@ -1,0 +1,49 @@
+name: train-dist-7b
+
+resources:
+  accelerators: {A100:8}
+  cloud: aws
+  region: us-east-2
+  image_id: ami-063428ce3e73b179b
+
+# this is the distributed part
+num_nodes: 2
+
+file_mounts:
+  /output:
+    source: s3://jpt-output
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+  echo "setup"
+
+run: |
+  requirements_path="requirements/requirements.txt"
+  env_name="train"
+  source ./bash/setup.sh; activate_or_create_conda_env $env_name $requirements_path
+  source ./bash/setup.sh; clean_tmp
+  
+  pip uninstall mosaicml-streaming -y
+  
+  sudo chmod go+rw /output
+  sudo mkdir /copy
+  sudo chmod go+rw /copy
+  
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  master_addr=`echo "$SKYPILOT_NODE_IPS" | head -n1`
+  nproc_per_node=${SKYPILOT_NUM_GPUS_PER_NODE}
+  node_rank=${SKYPILOT_NODE_RANK}
+
+  echo "num_nodes: $num_nodes"
+  echo "master_addr: $master_addr"
+  echo "nproc_per_node: $nproc_per_node"
+  echo "node_rank: $node_rank"
+
+  #source keys.env; PYTHONFAULTHANDLER=1 torchrun  \
+  #--nproc_per_node=$nproc_per_node \
+  #--node_rank=$node_rank \
+  #--nnodes=$num_nodes \
+  #--master_addr=$master_addr \
+  #--master_port=8008 \

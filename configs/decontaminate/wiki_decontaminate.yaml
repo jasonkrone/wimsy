@@ -1,0 +1,27 @@
+substitutions:
+  dataset: wiki
+  source_extension: jsonl.gz
+
+vars:
+  cleanup: &do_cleanup False # TODO: you'll want to change this to True for the larger datasets
+  is_distributed: &is_distributed False
+ 
+  downloader:
+    urls_path: &urls_path ./preprocessing/dataset_urls/dolma_v1dot6/$dataset.txt
+    num_files_per_shard: &num_files_per_shard 20
+    source_location: &source_location url
+
+  elastic_search_indexer:
+    num_documents_to_index: &num_documents_to_index 6_200_000 
+
+  decontaminator:
+    drop_entire_doc: &drop_entire_doc True
+    drop_doc_contamination_threshold: &drop_doc_contamination_threshold 1.0
+  
+  split_maker:
+    # TODO: you gotta change this for each dataset
+    # list here: https://docs.google.com/spreadsheets/d/1Gc2RKYD6QuzXwG0Vj54VQxRYxXcydTu9QxV8zEHrJAE/edit#gid=0
+    avg_num_tokens_per_doc: &avg_num_tokens_per_doc 590 
+    dev_size: &dev_size 5000
+
+include: _dolma_v1dot6_decontaminate_template_yaml

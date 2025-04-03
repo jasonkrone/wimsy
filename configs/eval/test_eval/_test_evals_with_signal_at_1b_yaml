@@ -1,0 +1,21 @@
+# would be great to get some GSM-8K multiple choice scores that were directionally helpful
+# honestly same w/ the programming questionszzzzzzzz
+signal_at_1b_eval_tasks: &signal_at_1b_eval_tasks
+    arc_easy:
+      shot: 0
+      batch_size: 64
+    hellaswag:
+      shot: 10
+      batch_size: 16
+    lambada_openai:
+      shot: 0
+      batch_size: 8
+    openbookqa:
+      shot: 0
+      batch_size: auto
+    piqa:
+      shot: 0
+      batch_size: 64
+    triviaqa_wiki:
+      shot: 5
+      batch_size: 4

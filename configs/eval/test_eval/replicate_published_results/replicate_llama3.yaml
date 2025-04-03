@@ -1,0 +1,49 @@
+wandb:
+  project_name: baseline_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+baselines:
+  # commonsenseqa
+  # openbookqa
+  # race
+  # squad
+  # winogrande
+  replicate_llama3:
+    id: hf
+    args: pretrained=meta-llama/Meta-Llama-3-8B
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baselines_07_30_24
+  tasks:
+    #openbookqa:
+    #  shot: 0
+    #  batch_size: auto
+    race_llama:
+      shot: 0
+      batch_size: auto
+    #squadv2_llama:
+    #  shot: 1
+    #  batch_size: auto
+    #winogrande:
+    #  shot: 5
+    #  batch_size: auto
+    #commonsense_qa_cot_fewshot:
+    #  shot: 7
+    #  batch_size: auto
+    #bbh_cot_fewshot:
+    #  shot: 3
+    #  batch_size: auto

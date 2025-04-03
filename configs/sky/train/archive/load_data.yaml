@@ -1,0 +1,21 @@
+name: prep_books
+
+resources:
+  cloud: aws
+  instance_type: c3.4xlarge
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+workdir: ~/Developer/jpt
+
+file_mounts:
+  /data:
+    name: jpk-data
+    mode: MOUNT
+
+setup: |
+  pip install torch 
+
+run: |
+  cd ~/sky_workdir
+  python train.py --config configs/train/train_small.yaml

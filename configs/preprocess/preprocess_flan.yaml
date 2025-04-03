@@ -1,0 +1,84 @@
+substitutions:
+  dataset: flan
+  source_extension: json.gz
+
+vars:
+  cleanup: &do_cleanup True
+  is_distributed: &is_distributed False
+
+  downloader:
+    urls_path: &urls_path ./preprocessing/dataset_urls/dolma_v1dot7/flan.txt
+    num_shards: &num_shards 1
+    source_location: &source_location url
+
+  elastic_search_indexer:
+    num_documents_to_index: &num_documents_to_index null
+
+  decontaminator:
+    drop_entire_doc: &drop_entire_doc True
+    drop_doc_contamination_threshold: &drop_doc_contamination_threshold 1.0
+
+  map_jsonl:
+    keys_to_remove: &keys_to_remove
+      - metadata
+      - attributes 
+
+  document_filter:
+    exclude_tasks: &exclude_tasks
+      - ".metadata._task_name == \"bool_q:1.0.0\""
+      - ".metadata._task_name == \"cot_gsm8k\""
+      - ".metadata._task_name == \"cot_gsm8k_ii\""
+      - ".metadata._task_name == \"drop:2.0.0\""
+      - ".metadata._task_name == \"lambada:1.0.0\""
+      - ".metadata._task_name == \"natural_questions_open:1.0.0\""
+      - ".metadata._task_name == \"race_high_Is_this_the_right_answer\""
+      - ".metadata._task_name == \"race_high_Read_the_article_and_answer_the_question_no_option_\""
+      - ".metadata._task_name == \"race_high_Select_the_best_answer\""
+      - ".metadata._task_name == \"race_high_Select_the_best_answer_generate_span_\""
+      - ".metadata._task_name == \"race_high_Select_the_best_answer_no_instructions_\""
+      - ".metadata._task_name == \"race_high_Taking_a_test\""
+      - ".metadata._task_name == \"race_high_Write_a_multi_choice_question_for_the_following_article\""
+      - ".metadata._task_name == \"race_high_Write_a_multi_choice_question_options_given_\""
+      - ".metadata._task_name == \"race_middle_Is_this_the_right_answer\""
+      - ".metadata._task_name == \"race_middle_Read_the_article_and_answer_the_question_no_option_\""
+      - ".metadata._task_name == \"race_middle_Select_the_best_answer\""
+      - ".metadata._task_name == \"race_middle_Select_the_best_answer_generate_span_\""
+      - ".metadata._task_name == \"race_middle_Select_the_best_answer_no_instructions_\""
+      - ".metadata._task_name == \"race_middle_Taking_a_test\""
+      - ".metadata._task_name == \"race_middle_Write_a_multi_choice_question_for_the_following_article\""
+      - ".metadata._task_name == \"race_middle_Write_a_multi_choice_question_options_given_\""
+      - ".metadata._task_name == \"task026_drop_question_generation\""
+      - ".metadata._task_name == \"task027_drop_answer_type_generation\""
+      - ".metadata._task_name == \"task028_drop_answer_generation\""
+      - ".metadata._task_name == \"task073_commonsenseqa_answer_generation\""
+      - ".metadata._task_name == \"task133_winowhy_reason_plausibility_detection\""
+      - ".metadata._task_name == \"task134_winowhy_reason_generation\""
+      - ".metadata._task_name == \"task135_winowhy_wrong_reason_generation\""
+      - ".metadata._task_name == \"task136_winowhy_knowledge_categorization\""
+      - ".metadata._task_name == \"task1564_triviaqa_answer_generation\""
+      - ".metadata._task_name == \"task1565_triviaqa_classification\""
+      - ".metadata._task_name == \"task1664_winobias_text_generation\""
+      - ".metadata._task_name == \"task309_race_answer_generation\""
+      - ".metadata._task_name == \"task310_race_classification\""
+      - ".metadata._task_name == \"task311_race_question_generation\""
+      - ".metadata._task_name == \"task340_winomt_classification_gender_pro\""
+      - ".metadata._task_name == \"task341_winomt_classification_gender_anti\""
+      - ".metadata._task_name == \"task342_winomt_classification_profession_pro\""
+      - ".metadata._task_name == \"task343_winomt_classification_profession_anti\""
+      - ".metadata._task_name == \"task350_winomt_classification_gender_identifiability_pro\""
+      - ".metadata._task_name == \"task351_winomt_classification_gender_identifiability_anti\""
+      - ".metadata._task_name == \"task453_swag_answer_generation\""
+      - ".metadata._task_name == \"task454_swag_incorrect_answer_generation\""
+      - ".metadata._task_name == \"task455_swag_context_generation\""
+      - ".metadata._task_name == \"task649_race_blank_question_generation\""
+      - ".metadata._task_name == \"task834_mathdataset_classification\""
+      - ".metadata._task_name == \"task835_mathdataset_answer_generation\""
+      - ".metadata._task_name == \"trivia_qa/rc:1.1.0\""
+
+  split_maker:
+    # TODO: you gotta change this for each dataset
+    # list here: https://docs.google.com/spreadsheets/d/1Gc2RKYD6QuzXwG0Vj54VQxRYxXcydTu9QxV8zEHrJAE/edit#gid=0
+    avg_num_tokens_per_doc: &avg_num_tokens_per_doc 316
+    dev_size: &dev_size 5000
+
+include: _prep_flan_template_yaml

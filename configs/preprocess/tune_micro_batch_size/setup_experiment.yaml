@@ -1,0 +1,17 @@
+substitutions:
+  dataset: ngram-sweep
+  source_extension: jsonl.zstd
+
+vars:
+  cleanup: &do_cleanup False
+  is_distributed: &is_distributed False #True TODO: this is just for testing
+ 
+  downloader:
+    urls_path: &urls_path ./preprocessing/dataset_urls/dclm_baseline/dclm_baseline_10.txt # TODO this is just for testing 
+    num_shards: &num_shards 1 # TODO this is just for testing
+    source_location: &source_location s3 # TODO change back to s3
+
+  elastic_search_indexer:
+    num_documents_to_index: &num_documents_to_index null 
+
+include: _setup_experiment_template_yaml 

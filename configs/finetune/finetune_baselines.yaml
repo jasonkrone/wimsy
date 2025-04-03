@@ -1,0 +1,81 @@
+##########################################
+#            Run specific params          #
+##########################################
+
+hyper_params:
+
+  trainer_id: &trainer_id hf_trainer
+
+  learning_rate: &learning_rate 0.0000143195
+
+  tokenizer: &tokenizer
+    id: hf_auto_tokenizer
+    args: null # set by finetune_hf_models.py
+
+  proccess_group:
+    # these are set by finetune_hf_models.py
+    init_process_group_at_start: &init_process_group_at_start null  # set by train scrpit
+    shutdown_distributed_processes_at_end: &shutdown_distributed_processes_at_end null # set by train script
+
+##########################################
+#                 Imports                #
+##########################################
+
+include: configs/finetune/_shared_finetune_hyper_params_yaml
+include: configs/finetune/_finetune_template_yaml
+
+##########################################
+#             Weights & Biases           #
+##########################################
+
+wandb:
+  project_name: finetune_for_hpo
+  run_name: null # set by finetune_hf_models.py
+
+############################################
+#                 Models                   #
+############################################
+
+base_models:
+  #pythia-1-dot-4b-deduped-27b-toks:
+  #  id: hf
+  #  args: "pretrained=EleutherAI/pythia-1.4b-deduped,revision=step13000"
+  #pythia-1-dot-4b-deduped-69b-toks:
+  #  id: hf
+  #  args: "pretrained=EleutherAI/pythia-1.4b-deduped,revision=step33000"
+  #pythia-1-dot-4b-deduped-111b-toks:
+  #  id: hf
+  #  args: "pretrained=EleutherAI/pythia-1.4b-deduped,revision=step53000"
+  olmo_1b_toks_50b:
+    id: hf
+    args: "pretrained=jasonkrone/olmo_1b_toks_50b,tokenizer=allenai/OLMo-1B-hf"
+  #olmo_1b_toks_75b:
+  #  id: hf
+  #  args: "pretrained=jasonkrone/olmo_1b_toks_75b,tokenizer=allenai/OLMo-1B-hf"
+  #olmo_1b_toks_126:
+  #  id: hf
+  #  args: "pretrained=jasonkrone/olmo_1b_toks_126,tokenizer=allenai/OLMo-1B-hf"
+
+model:
+  id: null
+  args: null
+  precision: bf16
+  do_compile: False
+  parallelism: fsdp_model
+  precision: bf16
+  max_len: 2048 # actual context len used is set by data loader to max len in dataset so MFU will be wrong
+
+############################################
+#              Checkpointing               #
+############################################
+
+ckpt:
+  checkpointer: fsdp_checkpointer
+  strip_prefix: _orig_mod.
+  save_best_model_at_end_for_eval: True
+  remote_output_dir: s3://jpt-output
+  local_output_dir: /output
+  hf_username: jasonkrone
+  copy_dir: /copy
+  ckpt_interval: *ckpt_interval
+

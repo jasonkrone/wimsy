@@ -1,0 +1,36 @@
+#########################################
+#                 Model                 #
+#########################################
+
+# very similar to the llama 1B model architecture
+# except that we're using res_post_norm_transformer block
+# we also use a different rope base 10k vs. 500k
+
+model:
+  use_compile_profiler: False
+  do_offload_activations: False
+  use_meta_device: True
+  use_cache: False
+  do_compile: True
+  parallelism: fsdp_model
+  id: decoder_lm
+  initializer: null
+  precision: bf16
+  vocab_size: 100288
+  n_layers: 16
+  d_model: 2048
+  n_heads: 32
+  n_kv_heads: 1
+  d_hidden: 8192
+  use_bias: False
+  use_qk_norm: True
+  max_len: &context_len 4096
+  transformer_block: res_post_norm_transformer_block
+  attn: flash_attn #cudnn_attn
+  mlp: mlp_swiglu
+  norm: rms_norm
+  pos_encoding: identity
+  qk_encoding: rotary_encoding
+  rope_base: 10_000
+  p_dropout: 0.0
+  init_stdev: null

@@ -1,0 +1,121 @@
+name: train-8node-h100
+
+resources:
+  instance_type: p5.48xlarge
+  cloud: aws
+  region: us-east-1
+  zone: us-east-1f
+  image_id:  ami-0222134238118d887 # << parall cluster | amazon linux 2 deep learning AMI: ami-02e407fb981a2b5e3 | ubuntu ami: ami-0ec6aaba9a8600809
+
+num_nodes: 8
+
+file_mounts:
+  /output:
+    source: s3://jpt-output
+    mode: MOUNT
+
+workdir: ~/Developer/jpt
+
+setup: |
+  env_name=train_env 
+  cd ~/sky_workdir
+  source ./bash/setup.sh ; activate_or_create_mini_conda_env $env_name
+ 
+
+run: |
+  echo "running"
+  
+  ####################################################
+  #                    Setup Env                     #
+  ####################################################
+  
+  env_name=train_env
+  env_path=/home/ubuntu/$env_name
+  conda activate $env_path
+
+  ####################################################
+  #         Random Export for torch >  2.1.2         #
+  ####################################################
+  #export LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | sed 's|:/usr/local/cuda/lib64||g; s|/usr/local/cuda/lib64:||g; s|/usr/local/cuda/lib64||g')
+  
+  ####################################################
+  #                    Setup EFA                     #
+  ####################################################
+  export FI_EFA_FORK_SAFE=1
+  export FI_LOG_LEVEL=1
+  export FI_PROVIDER=efa
+  export NCCL_DEBUG=INFO
+  ## Switching SYNC_MEMOPS to zero can boost throughput with FSDP
+  ## Disables CU_POINTER_ATTRIBUTE_SYNC_MEMOPS
+  ## Reduces memory synchronizations
+  ## https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__UNIFIED.html
+  export FI_EFA_SET_CUDA_SYNC_MEMOPS=0  
+  
+  ####################################################
+  #          Cleanup for Streaming Dataset           #
+  ####################################################
+  
+  source ./bash/setup.sh; clean_tmp
+  python -c 'import streaming; streaming.base.util.clean_stale_shared_memory()' 
+  
+  ####################################################
+  #          Get nodes & procs for torchrun          #
+  ####################################################
+  
+  num_nodes=`echo "$SKYPILOT_NODE_IPS" | wc -l`
+  master_addr=`echo "$SKYPILOT_NODE_IPS" | head -n1`
+  nproc_per_node=${SKYPILOT_NUM_GPUS_PER_NODE}
+  node_rank=${SKYPILOT_NODE_RANK}
+  
+  ####################################################
+  #                 Train my 7B                      #
+  ####################################################
+  
+  source keys.env; TORCH_CUDNN_SDPA_ENABLED=1 torchrun  \
+    --nproc_per_node=$nproc_per_node \
+    --node_rank=$node_rank \
+    --nnodes=$num_nodes \
+    --rdzv_backend=c10d \
+    --rdzv_endpoint=$master_addr:1234 \
+    -m main --config ./configs/train/7b_fsdp/train_7b.yaml
+    
+    #--master_addr=$master_addr \
+    #--master_port=8008 \
+  
+  ####################################################
+  #            Train FMS Demo from AWS               #
+  ####################################################
+  
+  #declare -a TORCHRUN_ARGS=(
+  #  --nproc_per_node=$nproc_per_node
+  #  --nnodes=$num_nodes
+  #  --rdzv_id=fsdp_demo
+  #  --rdzv_backend=c10d
+  #  --rdzv_endpoint=$master_addr:1234
+  #)
+
+  #declare -a TRAINING_ARGS=(
+  #    --max_context_width=4096
+  #    --num_key_value_heads=32 # 7b: 32 13b: 40 70b: 8
+  #    --llama_intermediate_size=11008 # 7b: 11008 13b: 13824 70b: 28672
+  #    --hidden_width=4096 # 7b: 4096 13b: 5120 70b: 8192
+  #    --num_layers=32 # 7b: 32 13b: 40 70b: 80
+  #    --num_heads=32 # 7b: 32 13b: 40 70b: 64
+  #    --model_type=llama_v2
+  #    --tokenizer="hf-internal-testing/llama-tokenizer"
+  #    --checkpoint_freq=5000
+  #    --validation_freq=500
+  #    --max_steps=5000
+  #    --checkpoint_dir=./checkpoints
+  #    --dataset='c4'
+  #    --dataset_config_name='en'
+  #    --resume_from_checkpoint=./checkpoints
+  #    --train_batch_size=1
+  #    --val_batch_size=1
+  #    --sharding_strategy="hybrid" # https://pytorch.org/docs/stable/fsdp.html
+  #    --offload_activations=1
+  #)
+  #
+  #cd fsdp-demo
+  #export TRAIN_SCRIPT=train
+  #torchrun "${TORCHRUN_ARGS[@]}" -m $TRAIN_SCRIPT "${TRAINING_ARGS[@]}"

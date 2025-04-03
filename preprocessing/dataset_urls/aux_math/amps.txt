@@ -1,0 +1,2 @@
+s3://amps-dataset/khan.jsonl.gz
+s3://amps-dataset/mathematica.jsonl.gz

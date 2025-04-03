@@ -1,0 +1,64 @@
+wandb:
+  project_name: baseline_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+eval_vars:
+  do_apply_chat_template: &do_apply_chat_template True
+  ifeval_max_gen_toks: &ifeval_max_gen_toks 1792
+
+include: configs/eval/test_eval/_test_evals_yaml
+
+baselines:
+
+  ########################################################################################
+  #                                Instruction Tuned Models                              #
+  ########################################################################################
+
+  ########## OpenELM Instruct ##########
+  #open_elm_instruct_1_dot_1b:
+  #  id: hf
+  #  args: pretrained=jasonkrone/OpenELM-1_1B-instruct-fix-nan,trust_remote_code=True,add_bos_token=True,tokenizer=jasonkrone/OpenELM-Instruct-Tokenizer
+
+  ############# Tiny Instruct ##########
+  #tiny-llama-chat-1-dot-1b-503b-toks:
+  #  id: hf
+  #  args: pretrained=TinyLlama/TinyLlama-1.1B-Chat-v0.1,tokenizer=jasonkrone/TinyLlama-1.1B-Chat-v0.1-Tokenizer
+
+  ############## pythia 6.9B Instruct ##########
+  #pythia-6-dot-9b-tulu-v1-sft:
+  #  id: hf
+  #  args: pretrained=allenai/open-instruct-pythia-6.9b-tulu,tokenizer=jasonkrone/open-instruct-pythia-6.9b-tulu-tokenizer
+
+  ############## Llama-1 Instruct ##########
+  #llama-1-7b-tulu-v1-sft:
+  #  id: hf
+  #  args: pretrained=/artifacts/tulu-7b-recovered,tokenizer=jasonkrone/tulu-7b-tokenizer
+
+  ############# OLMo 7b Instruct ##########
+  #olmo-7b-tulu-v2-sft:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-7B-SFT,trust_remote_code=True
+
+  #olmo-7b-tulu-v2-instruct:
+  #  id: hf
+  #  args: pretrained=allenai/OLMo-7B-Instruct,trust_remote_code=True
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  clear_cache: True
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baselines
+  tasks:
+    <<: *test_eval_tasks

@@ -1,0 +1,2 @@
+https://olmo-data.org/dolma-v1_6/wiki/en_simple_wiki_v0-0000.json.gz
+https://olmo-data.org/dolma-v1_6/wiki/en_simple_wiki_v0-0001.json.gz

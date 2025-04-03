@@ -1,0 +1,25 @@
+name: make_dolma_dev_split
+
+resources:
+  cloud: aws
+  instance_type: c3.4xlarge
+  region: us-east-1
+  image_id: ami-0ea5e9630dcf98849
+
+workdir: ~/Developer/jpt
+
+setup: |
+  pip install numpy 
+  aws s3 cp s3://jpk-data/dolma/tokenized/c4/train-1-of-9.bin ./data/.
+  aws s3 cp s3://jpk-data/dolma/tokenized/c4/train-1-of-9.idx ./data/.
+
+run: |
+  cd ~/sky_workdir
+  #mkdir ./data
+
+  source keys.env; python -m data_prep.make_dev_split \
+    --input_bin_path ./data/train-1-of-9.bin \
+    --input_idx_path ./data/train-1-of-9.idx \
+    --output_bin_path ./data/dolma_dev.bin \
+    --output_idx_path ./data/dolma_dev.idx \
+    --entire_documents

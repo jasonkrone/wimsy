@@ -1,0 +1,110 @@
+scaling_law_eval_tasks: &scaling_law_eval_tasks
+
+  arc_easy:
+    shot: 0
+    batch_size: 64
+  arc_easy_hpo_4choice:
+    shot: 0
+    batch_size: 64
+
+  hellaswag:
+    shot: 10
+    batch_size: 16
+  hellaswag_hpo:
+    shot: 10
+    batch_size: 8
+
+  openbookqa:
+    shot: 0
+    batch_size: auto
+  openbookqa_hpo:
+    shot: 0
+    batch_size: auto
+
+  piqa:
+    shot: 0
+    batch_size: auto
+  piqa_hpo:
+    shot: 0
+    batch_size: auto
+
+  # generative
+  triviaqa_wiki:
+    shot: 5
+    batch_size: 4
+  triviaqa_wiki_hpo:
+    shot: 5
+    batch_size: 4
+
+  lambada_openai:
+    shot: 0
+    batch_size: 8
+  lambada_hpo:
+    shot: 0
+    batch_size: 8
+
+  drop:
+    shot: 3
+    batch_size: 1
+  drop_hpo:
+    shot: 3 
+    batch_size: 4 # TODO: this is a guess, could be super off
+
+
+  ###############################################################
+
+  arc_challenge:
+    shot: 0
+    batch_size: 64
+  arc_challenge_hpo_4choice:
+    shot: 0
+    batch_size: 64
+
+  boolq:
+    shot: 0
+    batch_size: 16
+  boolq_hpo:
+    shot: 0
+    batch_size: 16
+
+  commonsense_qa_cot_fewshot:
+    shot: 7
+    batch_size: auto
+  commonsense_qa_hpo_4choice:
+    shot: 7
+    batch_size: auto
+
+  gsm8k_cot:
+    shot: 8
+    batch_size: 8
+  gsm8k_mc_hpo:
+    shot: 8
+    batch_size: 8
+  
+  humaneval_greedy:
+    shot: 0
+    batch_size: 8
+  pythonio_mc_hpo:
+    shot: 0
+    batch_size: 8
+
+  mmlu:
+    shot: 5
+    batch_size: 6
+  mmlu_hpo:
+    shot: 5
+    batch_size: 6
+
+  race_h_all_questions:
+    shot: 0
+    batch_size: auto
+  race_hpo:
+    shot: 0
+    batch_size: auto
+
+  winogrande:
+    shot: 5
+    batch_size: 4
+  winogrande_hpo:
+    shot: 5
+    batch_size: 4

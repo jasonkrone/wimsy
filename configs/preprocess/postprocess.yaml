@@ -1,0 +1,38 @@
+vars:
+  context_len: &context_len 4096
+  s3_dataset_dirs: &s3_dataset_dirs
+    #- s3://mathcoder2-synthmath-mds-decontaminated-ctx-4096-tokenizer-tikt
+    - s3://tulu-math-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://amps-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://flan-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://pes2o-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://starcoder-mds-decontam-ctx-4096-tokenizer-tiktoken
+    #- s3://wiki-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://algebraic-stack-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://arxiv-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://books-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://open-web-math-mds-decontaminated-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.32-leq-0.36-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.36-leq-0.40-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.40-leq-0.46-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.46-leq-0.52-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.52-leq-0.59-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.59-leq-0.68-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.68-leq-0.78-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.78-leq-0.88-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.88-leq-0.97-ctx-4096-tokenizer-tiktoken
+    #- s3://dclm-top500b-gre-0.97-leq-1.00-ctx-4096-tokenizer-tiktoken
+
+pipeline:
+  - id: index_merger
+    args:
+      s3_dirs: *s3_dataset_dirs
+      split_subdirs:
+        - train
+        - dev
+
+  - id: dataset_stats_reporter
+    args:
+      context_len: *context_len
+      save_path: "./figures/artifacts/pretrain_data_v4_12_26_24.csv"
+      dataset_dirs: *s3_dataset_dirs

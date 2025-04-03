@@ -1,0 +1,90 @@
+
+substitutions:
+  dataset: starcoder
+  source_extension: json.gz
+
+vars:
+  cleanup: &do_cleanup True
+  is_distributed: &is_distributed True
+
+  downloader:
+    urls_path: &urls_path ./preprocessing/dataset_urls/dolma_v1dot7/starcoder_70b.txt
+    num_shards: &num_shards 2
+    source_location: &source_location url
+
+  sampler:
+    sampler_jsonpath: &sampler_jsonpath metadata.extension
+    source_regex_to_value_to_samples: &source_regex_to_value_to_samples
+      ".*/starcoder-0000.json.gz$$":
+        assembly: 247916
+      ".*/starcoder-0001.json.gz$$":
+        c-sharp: 4263303
+      ".*/starcoder-0004.json.gz$$":
+        c: 470238
+      ".*/starcoder-0006.json.gz$$":
+        cpp: 2507761
+      ".*/starcoder-0007.json.gz$$":
+        css: 1074229
+      ".*/starcoder-0008.json.gz$$":
+        dockerfile: 571497
+        fortran: 158790
+        cuda: 58150
+      ".*/starcoder-0016.json.gz$$":
+        go: 1855314
+      ".*/starcoder-0018.json.gz$$":
+        html: 1302504
+      ".*/starcoder-0022.json.gz$$":
+        java: 3538937
+      ".*/starcoder-0025.json.gz$$":
+        javascript: 2602662
+      ".*/starcoder-0028.json.gz$$":
+        jupyter-scripts-dedup-filtered: 783321
+        jupyter-structured-clean-dedup: 668738
+      ".*/starcoder-0036.json.gz$$":
+        pascal: 110980
+        mathematica: 22652
+        matlab: 93
+      ".*/starcoder-0038.json.gz$$":
+        php: 1305311
+      ".*/starcoder-0039.json.gz$$":
+        python: 872309
+      ".*/starcoder-0043.json.gz$$":
+        python: 1526528
+        ruby: 1338170
+        r: 39042
+        rmarkdown: 5386
+      ".*/starcoder-0044.json.gz$$":
+        shell: 885811
+        rust: 783321
+      ".*/starcoder-0045.json.gz$$":
+        sql: 975406
+        tex: 435644
+      ".*/starcoder-0046.json.gz$$":
+        tex: 87128
+      ".*/starcoder-0047.json.gz$$":
+        visual-basic: 161238
+      
+  elastic_search_indexer:
+    num_documents_to_index: &num_documents_to_index null
+
+  contaminated_span_tagger:
+    ngrams_path: &ngrams_path /sky_workdir/test_and_dev_13_grams.jsonl.gz
+    contaminated_span_tagger_ckpt: &contaminated_span_tagger_ckpt null 
+    analysis_ckpt_path: &analysis_ckpt_path /local_out/contam-analysis-starcoder-metadata/node-1-of-2/ckpt_contaminated_spans.json
+
+  decontaminator:
+    drop_entire_doc: &drop_entire_doc True
+    drop_doc_contamination_threshold: &drop_doc_contamination_threshold 1.0
+
+  map_jsonl:
+    keys_to_remove: &keys_to_remove
+      - metadata
+      - created
+
+  split_maker:
+    # TODO: you gotta change this for each dataset
+    # list here: https://docs.google.com/spreadsheets/d/1Gc2RKYD6QuzXwG0Vj54VQxRYxXcydTu9QxV8zEHrJAE/edit#gid=0
+    avg_num_tokens_per_doc: &avg_num_tokens_per_doc 1276
+    dev_size: &dev_size 5000
+
+include: _prep_starcoder_template_yaml 

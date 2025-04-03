@@ -1,0 +1,38 @@
+wandb:
+  project_name: baseline_eval
+  run_name: null
+
+compute:
+  device: cuda
+  is_distributed: True
+
+seed: &seed 414
+
+baselines:
+  # gpqa
+  # ifeval
+  replicate_llama3_dot_1_instruct:
+    id: hf
+    args: pretrained=meta-llama/Meta-Llama-3.1-8B-Instruct
+
+
+# model info will be set by scripts to the baseline info above
+model:
+  id: null
+  args: null
+
+test_eval:
+  include_path: ./tasks
+  log_samples: True
+  limit: null
+  output_path: /output/baselines_07_30_24
+  tasks:
+    #gpqa_main_zeroshot:
+    #  shot: 0
+    #  batch_size: auto
+    gpqa_main_cot_zeroshot_llama3:
+      shot: 0
+      batch_size: auto
+    #ifeval_llama_instruct:
+    #  shot: 0
+    #  batch_size: auto

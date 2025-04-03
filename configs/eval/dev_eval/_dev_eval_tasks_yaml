@@ -1,0 +1,49 @@
+non_multi_choice_dev_eval_tasks: &non_multi_choice_dev_eval_tasks
+  lambada_hpo:
+    shot: 0
+    batch_size: 8
+  triviaqa_wiki_hpo:
+    shot: 5
+    batch_size: 4
+
+
+multi_choice_dev_eval_tasks: &multi_choice_dev_eval_tasks
+  arc_easy_hpo_4choice:
+    shot: 0
+    batch_size: 64
+  arc_challenge_hpo_4choice:
+    shot: 0
+    batch_size: 64
+  boolq_hpo:
+    shot: 0
+    batch_size: 16
+  commonsense_qa_hpo_4choice:
+    shot: 7
+    batch_size: auto
+  gsm8k_mc_hpo:
+    shot: 8
+    batch_size: 8
+  hellaswag_hpo:
+    shot: 10
+    batch_size: 8
+  pythonio_mc_hpo:
+    shot: 0
+    batch_size: 8
+  math_mc_hpo:
+    shot: 4
+    batch_size: 8
+  mmlu_hpo:
+    shot: 5
+    batch_size: 8
+  openbookqa_hpo:
+    shot: 0
+    batch_size: auto
+  piqa_hpo:
+    shot: 0
+    batch_size: auto
+  race_hpo:
+    shot: 0
+    batch_size: auto
+  winogrande_hpo:
+    shot: 5
+    batch_size: 4
