@@ -1,13 +1,36 @@
+# Wimsy
 
-My setup is entirely config defined.
+## What's Wimsy? 
 
-I use skypilot (CLI util) to launch my clusters and run my jobs. You'll find skypilot configs for all my job types under ./configs/sky
+Wimsy is a general purpose, dense, decoder-only LLM that will come in two sizes: Wimsy-1b and Wimsy-7b. 
 
-The skypilot configs specify the hardware to use, how to setup dependencies, and what command to run on the cluster.
+Wimsy-1b, which is trained on 50B tokens, is complete (huggingface checkpoint coming soon). 
 
-The training, preparation, eval jobs I run on the cluster are also config defined i.e. all the hyper-parameters, architecture, etc. are specified in yaml configs as well. The job configs are also located under ./configs. For example, ./configs/train/wimsy/wimsy_1b contains the pre-training configs for experiments on my 1B models.
+Wimsy-7b, which will be trained on 300B tokens, is currently under development (pre-training run kicking off in ~2 weeks).
 
-I use Docker + enroot for dependency management. You'll find my dockerfiles for training and data prep under ./docker/train_and_eval/Dockerfile and ./docker/data_prep/Dockerfile respectively.
+## How good is Wimsy? 
 
-My evaluation code wraps the lm-evaluation-harness repo from EleutherAI. I've created my own fork which adds some tasks and fixes a few bugs: https://github.com/jasonkrone/lm-evaluation-harness/tree/main-jpt. To use my evaluation code, you need to clone my fork of lm-evaluation-harness at the root of this repo.
+Wimsy-1b performs comparable to or better than baselines (olmo-1b & pythia-1b), which were trained on 2x as much data, on 5/6 of our test sets. 
 
+On the Lambada test set, we find that pythia-1b outperforms Wimsy-1b at the ~4 PF-day scale. 
+
+In ablations we demonstrate that this gap is due to pythia-1b being trained on the books corpus, from which the Lambada dataset is constructed.
+
+See the plots of our results below! 
+
+#### Wimsy-1b Test Performance vs. Baselines
+
+![Wimsy-1b Test Performance vs. Baselines](./images/wimsy-1b-vs-olmo-1b-pythia-1b.png)
+
+
+#### Wimsy-1b Ablation: Lambada Performance When Pre-training With vs. Without Books Corpus 
+
+
+![Wimsy-1b Performance with vs. without books](./images/wimsy-1b-with-and-without-books.png)
+
+
+
+
+## Where can I learn more? 
+
+Checkout [this talk](https://drive.google.com/file/d/180WavTPjZOD6qiwNefjoHE0AMa4JD0tT/view?usp=sharing) I gave at essential.ai on Wimsy-1b! 
